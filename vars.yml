@@ -1,0 +1,32 @@
+---
+author: Nolan W. <nolan_w@sfu.ca>
+url: https://github.com/brinkmanlab/
+vendor: Brinkman Lab
+
+instance: ''  # TODO remove
+
+irida:
+  version: 20.05.2
+
+containers:
+  app:
+    name: irida-app  # Must be valid hostname (no underscores)
+  db:
+    name: irida-db  # Must be valid hostname (no underscores)
+  galaxy:
+    name: galaxy-web  # Must be valid hostname (no underscores)
+
+volumes:
+  user_data:
+    name: user_data
+  db_data:
+    name: db_data
+
+paths:
+  data: /data
+  sequences: /data/sequences
+  reference: /data/reference
+  output: /data/output
+  assembly: /data/assembly
+  tmp: /tmp
+  config: /etc/irida

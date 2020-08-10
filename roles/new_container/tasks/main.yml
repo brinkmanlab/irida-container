@@ -1,0 +1,33 @@
+---
+- name: Create container
+  command: buildah from {{ base_image }}
+  register: container_handle
+
+- debug:
+    var: container_handle.stdout
+
+- name: Configure container
+  # TODO - healthcheck command
+  # https://docs.galaxyproject.org/en/master/admin/scaling.html#uwsgi-for-web-serving-and-webless-galaxy-applications-as-job-handlers
+  command: >-
+    buildah config
+    --author "{{ author }}"
+    {% if entrypoint is defined %}
+    --entrypoint '{{ entrypoint }}'
+    {% endif %}
+    {% if cmd is defined %}
+    --cmd '{{ cmd }}'
+    {% endif %}
+    {% if envs is defined %}
+    {% for k, v in envs %}
+    --env {{ k }}={{ v }}
+    {% endfor %}
+    {% endif %}
+    {{ container_handle.stdout }}
+
+- name: Add application container to inventory
+  add_host:
+    name: '{{ name }}'
+    ansible_connection: buildah
+    remote_user: '{{ user }}'
+    ansible_host: "{{ container_handle.stdout }}"

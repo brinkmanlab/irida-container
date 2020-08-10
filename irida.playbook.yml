@@ -1,0 +1,81 @@
+#!/usr/bin/env -S buildah unshare ansible-playbook
+---
+- name: Start Maven container
+  hosts: buildah_server
+  vars_files: [vars.yml]
+  tasks:
+    - name: Resolve host UID
+      command: id -u
+      register: uid
+    - name: Resolve host GID
+      command: id -g
+      register: gid
+    - name: Create Maven Instance
+      docker_container:
+        name: maven
+        image: maven
+        command: sleep 1h
+        volumes:
+        - '{{ playbook_dir }}/irida:/tmp/irida'
+        auto_remove: yes
+        user: "{{ uid.stdout }}:{{ gid.stdout }}"
+
+    - name: Add Maven container to inventory
+      add_host:
+        name: Maven
+        ansible_connection: docker
+        ansible_host: maven
+
+- name: Build IRIDA
+  hosts: Maven
+  vars_files: [vars.yml]
+  gather_facts: false
+  tasks:
+    - name: Install dependencies
+      command:
+        cmd: ./install-libs.sh
+        chdir: /tmp/irida/lib/
+    - name: Build IRIDA
+      command:
+        cmd: mvn clean package -DskipTests=true -Dhbm.dev.auto=create
+        chdir: /tmp/irida/
+
+- name: Shutdown Maven
+  hosts: buildah_server
+  tasks:
+    - docker_container:
+        name: maven
+        state: absent
+
+- name: Create IRIDA Application Container
+  hosts: buildah_server
+  gather_facts: false
+  vars_files: [vars.yml]
+  roles:
+  - role: new_container
+    vars:
+      name: "{{ containers.app.name }}"
+      base_image: tomcat:9 #jdk11-openjdk-slim
+
+- name: Configure Container Environment
+  hosts: "{{ containers.app.name }}"
+  gather_facts: false
+  vars_files: [vars.yml]
+  roles: [irida_app]
+  pre_tasks:
+  - name: Fetch packages
+    raw: apt-get update
+  - raw: apt-get purge -y python*
+  - name: Install python
+    raw: apt-get install -y --no-install-recommends python3-lxml
+  post_tasks:
+  - name: Clean python
+    raw: apt-get purge -y python3-lxml
+
+- name: Finish IRIDA Application Container
+  hosts: buildah_server
+  gather_facts: false
+  vars_files: [vars.yml]
+  tasks:
+  - name: Commit container
+    command: buildah commit {{ hostvars[containers.app.name]['ansible_host'] }} {{ containers.app.name }}

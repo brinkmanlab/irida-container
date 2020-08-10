@@ -1,0 +1,45 @@
+---
+- name: Create paths
+  file:
+    path: "{{ item }}"
+    recurse: yes
+    state: directory
+  loop: "{{ paths.values() | list }}"
+
+- name: Configure server
+  xml:
+    path: /usr/local/tomcat/conf/server.xml
+    xpath: "{{ item.xpath }}"
+    attribute: "{{ item.attribute }}"
+    value: "{{ item.value }}"
+  loop:
+    - xpath: /Server/Service/Engine/Host
+      attribute: workDir
+      value: "{{ paths.tmp }}/tomcat/"
+    - xpath: /Server/Service/Connector
+      attribute: port
+      value: "80"
+
+- name: Generate irida.conf
+  template:
+    src: irida.conf.j2
+    dest: "{{ paths.config }}/irida.conf"
+    mode: u=rw,g=r,o=r
+
+- name: Generate web.conf
+  template:
+    src: web.conf.j2
+    dest: "{{ paths.config }}/web.conf"
+    mode: u=rw,g=r,o=r
+
+- name: Import irida.war
+  copy:
+    src: "{{ playbook_dir }}/irida/target/irida-{{ irida.version }}.war"
+    dest: "/usr/local/tomcat/webapps/ROOT.war"
+    mode: u=rw,g=r,o=r
+
+- name: Bundle tool list
+  copy:
+    src: "{{ playbook_dir }}/irida/target/tools-list.yml"
+    dest: "{{ paths.config }}/tool-list.yml"
+    mode: u=rw,g=r,o=r
