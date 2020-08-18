@@ -3,7 +3,7 @@
 ## Build
 
 To build the containers, ensure you have buildah, docker, terraform, and ansible-playbook installed and configured.
-Ensure docker can be [run without root privledges](https://docs.docker.com/engine/install/linux-postinstall/).
+Ensure docker can be [run without root privileges](https://docs.docker.com/engine/install/linux-postinstall/).
 
 Run `./webserver.playbook.yml` and `./application.playbook.yml` to build the containers.
 
@@ -32,12 +32,12 @@ Currently terraform does not support optional providers and so this has to be a 
 ### AWS
 
 After running `terraform apply` it generates a kubeconfig file allowing you to run kubectl commands on the kubernetes cluster.
-Install kubectl, aws-iam-authenticator, and `export KUBECONFIG=./kubeconfig_irida-cluster`. Run `kubectl proxy`.
-`kubectl apply --kubeconfig kubeconfig_irida-cluster -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml`
-Visit [](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) to
-access the dashboard. The `kubeconfig_irida-cluster` file does not include the 
+Install kubectl, aws-iam-authenticator, and `export KUBECONFIG=./kubeconfig_irida`. Run `kubectl proxy`.
+`kubectl apply --kubeconfig kubeconfig_irida -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml`
+Visit [here](http://localhost:8001/api/v1/namespaces/kube-system/services/https:dashboard-chart-kubernetes-dashboard:https/proxy/#/login) to
+access the dashboard. The `kubeconfig_irida` file does not include the 
 [token required for authentication](https://github.com/kubernetes/dashboard/issues/2474#issuecomment-348811806). 
-Run `aws-iam-authenticator token -i irida-cluster --token-only` to get the required token.
+Run `aws-iam-authenticator token -i irida --token-only` to get the required token.
 
 ### Kubernetes
 

@@ -5,6 +5,6 @@ output "db_root" {
 }
 
 output "network" {
-  value = local.network
+  value       = local.network
   description = "Network name. If var.network not provided, returns generated network name, otherwise same as var.network"
 }

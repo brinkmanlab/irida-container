@@ -1,5 +1,5 @@
 variable "network" {
   type        = string
-  default = ""
+  default     = ""
   description = "Docker network name"
 }

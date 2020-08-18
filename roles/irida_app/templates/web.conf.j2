@@ -4,7 +4,7 @@
 #server.base.url=
 
 # Mail server configuration settings
-mail.server.host=mail
+mail.server.host={{ hostvars['mail'].hostname }}
 mail.server.protocol={{ hostvars['mail'].protocol }}
 #mail.server.email=
 #mail.server.username=

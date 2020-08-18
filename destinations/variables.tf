@@ -1,10 +1,11 @@
 locals {
+  name_suffix = var.instance == "" ? "" : "-${var.instance}"
   db_conf = var.db_conf != null ? var.db_conf : {
     scheme = "mysql"
-    host = var.db_name
-    name = "irida${var.name_suffix}"
-    user = "irida"
-    pass = random_password.db_password[0].result
+    host   = var.db_name
+    name   = "irida${local.name_suffix}"
+    user   = "irida"
+    pass   = random_password.db_password[0].result
   }
   profiles = {
     front      = ["web"]
@@ -25,7 +26,7 @@ locals {
     var.galaxy_user_email == "" ? "" : "galaxy.execution.email='${var.galaxy_user_email}'",
     var.mail_from == "" ? "" : "mail.server.email='${var.mail_from}'",
     var.mail_user == "" ? "" : "mail.server.username='${var.mail_user}'",
-    var.mail_password == "" ? "" : "mail.server.password='${var.mail_password}'",  # TODO use k8s secret?
+    var.mail_password == "" ? "" : "mail.server.password='${var.mail_password}'", # TODO use k8s secret?
     var.ncbi_user == "" ? "" : "ncbi.upload.user='${var.ncbi_user}'",
     var.ncbi_password == "" ? "" : "ncbi.upload.password='${var.ncbi_password}'",
     var.help_title == "" ? "" : "help.page.title='${var.help_title}'",
@@ -37,18 +38,14 @@ locals {
 }
 
 resource "random_password" "db_password" {
-  count = var.db_conf == null ? 1 : 0
-  length = 16
+  count   = var.db_conf == null ? 1 : 0
+  length  = 16
   special = false
-}
-
-variable "depends" {
-  default = null
 }
 
 variable "instance" {
   type        = string
-  default = ""
+  default     = ""
   description = "Unique deployment instance identifier"
 }
 
@@ -66,26 +63,14 @@ variable "db_name" {
 
 variable "user_data_volume_name" {
   type        = string
-  default     = "user_data"
+  default     = "user-data"
   description = "User data volume name"
 }
 
 variable "db_data_volume_name" {
   type        = string
-  default     = "db_data"
+  default     = "db-data"
   description = "Database volume name"
-}
-
-variable "object_store_access_key" {
-  type        = string
-  default     = ""
-  description = "Object store access key"
-}
-
-variable "object_store_secret_key" {
-  type        = string
-  default     = ""
-  description = "Object store secret key"
 }
 
 variable "data_dir" {
@@ -106,12 +91,6 @@ variable "image_tag" {
   description = "Tag for irida_app image"
 }
 
-variable "name_suffix" {
-  type        = string
-  default     = ""
-  description = "Suffix to attach to all resource identifiers. This allows multiple instances to be ran without name collisions."
-}
-
 variable "front_replicates" {
   type        = number
   default     = 1
@@ -126,7 +105,6 @@ variable "processing_replicates" {
 
 variable "base_url" {
   type        = string
-  default = ""
   description = "The externally visible URL for accessing this instance of IRIDA. This key is used by the e-mailer when sending out e-mail notifications (password resets, for example) and embeds this URL directly in the body of the e-mail."
 }
 
@@ -173,20 +151,20 @@ variable "help_title" {
 }
 
 variable "help_url" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
   description = "The link for an external help resource"
 }
 
 variable "help_email" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
   description = "The e-mail address for contacting an administrator for help"
 }
 
 variable "analysis_warning" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
   description = "Display a dismissable warning above all analysis results and metadata pages"
 }
 
@@ -198,13 +176,13 @@ variable "hide_workflows" {
 
 variable "db_conf" {
   type = object({
-        scheme = string
-    host = string
-    name = string
-    user = string
-    pass = string
+    scheme = string
+    host   = string
+    name   = string
+    user   = string
+    pass   = string
   })
-  default = null
+  default     = null
   description = "Database configuration overrides"
 }
 
@@ -218,4 +196,10 @@ variable "db_image" {
   type        = string
   default     = "mariadb"
   description = "MariaDB image name (Ignored if destination provides hosted database)"
+}
+
+variable "debug" {
+  type        = bool
+  default     = false
+  description = "Enabling will put the deployment into a mode suitable for debugging"
 }
