@@ -5,6 +5,7 @@ locals {
   mail_port      = regex("(?m)^mail.*port=(?P<mail_port>[^ ]+)", file("${path.root}/inventory.ini")).mail_port
   name_suffix    = var.instance != "" ? "-${var.instance}" : ""
   debug          = true
+  region = "us-west-2"
 }
 
 ## Docker Config
@@ -16,7 +17,7 @@ provider "docker" {
 ## AWS Config
 
 provider "aws" {
-  region  = "us-west-2"
+  region  = local.region
   version = "~> 2.0"
 }
 
@@ -24,6 +25,7 @@ module "galaxy_aws" {
   #count = var.destination == "aws" ? 1 : 0
   source                  = "./galaxy/destinations/aws"
   cluster_name            = "irida${local.name_suffix}"
+  uwsgi_port              = local.ansible_galaxy.uwsgi.port
   web_name                = local.ansible_galaxy.containers.web.name
   app_name                = local.ansible_galaxy.containers.app.name
   worker_name             = local.ansible_galaxy.containers.worker.name
@@ -38,8 +40,10 @@ module "galaxy_aws" {
   galaxy_web_image        = "brinkmanlab/${local.ansible_galaxy.containers.web.name}"
   instance                = var.instance
   galaxy_conf = {
-    email_from     = var.email
-    error_email_to = var.email
+    email_from          = var.email
+    error_email_to      = var.email
+    require_login       = true
+    allow_user_creation = false
   }
   image_tag = var.image_tag
   mail_name = local.mail_name
@@ -62,64 +66,65 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.cluster.token
   load_config_file       = false
 }
-/*
+
 provider "restapi" {
-  uri = "http:"
+  uri                  = "http:"
   write_returns_object = true
-  debug = true
 }
 
 resource "random_password" "irida_user" {
-  length = 16
+  length  = 16
   special = false
 }
 
 resource "restapi_object" "irida_user" {
-  depends_on = [module.galaxy_aws.endpoint]
-  path = "//${module.galaxy_aws.endpoint}/api/users?key=${module.galaxy_aws.master_api_key}"
+  depends_on   = [module.galaxy_aws.endpoint]
+  path         = "//${replace(module.galaxy_aws.endpoint, "http://", "")}/api/users?key=${module.galaxy_aws.master_api_key}"
+  create_path  = "//${replace(module.galaxy_aws.endpoint, "http://", "")}/api/users?key=${module.galaxy_aws.master_api_key}"
+  read_path    = "//${replace(module.galaxy_aws.endpoint, "http://", "")}/api/users/{id}?key=${module.galaxy_aws.master_api_key}"
+  update_path  = "//${replace(module.galaxy_aws.endpoint, "http://", "")}/api/users/{id}?key=${module.galaxy_aws.master_api_key}"
+  destroy_path = "//${replace(module.galaxy_aws.endpoint, "http://", "")}/api/users/{id}?key=${module.galaxy_aws.master_api_key}"
   data = jsonencode({
-    username = "irida"
+    username = "irida1"
     password = random_password.irida_user.result
-    email = "irida@irida.ca"
+    email    = "irida1@irida.ca"
   })
 }
 
-provider "restapi" {
-  uri = "http:"
-  username = "irida"
-  password = random_password.irida_user.result
-  debug = true
-  alias = "galaxy_auth"
+resource "null_resource" "fetch_api_key" {
+  depends_on = [restapi_object.irida_user]
+  triggers = {
+    user = restapi_object.irida_user.id
+  }
+  provisioner "local-exec" {
+    command = "curl --user 'irida1@irida.ca:${random_password.irida_user.result}' -o api_key.json -- ${module.galaxy_aws.endpoint}/api/authenticate/baseauth"
+  }
 }
 
-data "restapi_object" "irida_user" {
-  depends_on = [restapi_object.irida_user]
-  provider = restapi.galaxy_auth
-  path = "//${module.galaxy_aws.endpoint}/api/authenticate/baseauth"
-  search_key = "id"
-  search_value = restapi_object.irida_user.id
-  #results_key =
+data "local_file" "api_key" {
+  depends_on = [null_resource.fetch_api_key]
+  filename   = "api_key.json"
 }
-*/
+
 module "irida_aws" {
   #count = var.destination == "aws" ? 1 : 0
-  source                 = "./destinations/aws"
-  depends_on             = [module.galaxy_aws.eks]
-  cluster_name           = "irida${local.name_suffix}"
-  image_tag              = var.image_tag
-  instance               = var.instance
-  galaxy_api_key         = "" #jsondecode(data.restapi_object.irida_user.api_response)["api_key"]
-  galaxy_user_email      = "irida@irida.ca"
-  mail_from              = var.email
-  mail_user              = module.galaxy_aws.smtp_conf["smtp_username"]
-  mail_password          = module.galaxy_aws.smtp_conf["smtp_password"]
-  app_name               = local.ansible.containers.app.name
-  db_name                = local.ansible.containers.db.name
-  data_dir               = local.ansible.paths.data
-  tmp_dir                = local.ansible.paths.tmp
-  user_data_volume_name  = local.ansible.volumes.user_data.name
-  db_data_volume_name    = local.ansible.volumes.db_data.name
-  base_url               = var.base_url != "" ? var.base_url : module.galaxy_aws.endpoint
+  source                = "./destinations/aws"
+  depends_on            = [module.galaxy_aws.eks]
+  cluster_name          = "irida${local.name_suffix}"
+  image_tag             = var.image_tag
+  instance              = var.instance
+  galaxy_api_key        = jsondecode(data.local_file.api_key.content).api_key
+  galaxy_user_email     = "irida1@irida.ca"
+  mail_from             = var.email
+  mail_user             = module.galaxy_aws.smtp_conf["smtp_username"]
+  mail_password         = module.galaxy_aws.smtp_conf["smtp_password"]
+  app_name              = local.ansible.containers.app.name
+  db_name               = local.ansible.containers.db.name
+  data_dir              = local.ansible.paths.data
+  tmp_dir               = local.ansible.paths.tmp
+  user_data_volume_name = local.ansible.volumes.user_data.name
+  db_data_volume_name   = local.ansible.volumes.db_data.name
+  base_url               = var.base_url #!= "" ? var.base_url : module.galaxy_aws.endpoint
   nfs_server             = module.galaxy_aws.efs_user_data
   vpc_security_group_ids = [module.galaxy_aws.eks.worker_security_group_id]
   db_subnet_group_name   = module.galaxy_aws.vpc.database_subnet_group

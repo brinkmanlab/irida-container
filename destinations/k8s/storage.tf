@@ -9,11 +9,14 @@ resource "kubernetes_job" "init_nfs" {
       metadata {}
       spec {
         container {
-          name    = "init-nfs-irida"
-          image   = "alpine"
-          command = ["install", "-d", "-m", "0777", "-o", "1000", "-g", "1000", "${var.data_dir}/${local.instance}/${var.app_name}/"]
+          name  = "init-nfs-irida"
+          image = "${var.irida_image}:${var.image_tag}"
+          command = [
+            "sh", "-c",
+            "install -d -m 0777 -o 1000 -g 1000 /mnt/${local.instance}/${var.app_name}/ && cp -r ${var.data_dir}/* /mnt/${local.instance}/${var.app_name}/"
+          ]
           volume_mount {
-            mount_path = var.data_dir
+            mount_path = "/mnt"
             name       = "data"
           }
         }

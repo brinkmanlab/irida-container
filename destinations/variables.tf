@@ -105,6 +105,7 @@ variable "processing_replicates" {
 
 variable "base_url" {
   type        = string
+  default     = ""
   description = "The externally visible URL for accessing this instance of IRIDA. This key is used by the e-mailer when sending out e-mail notifications (password resets, for example) and embeds this URL directly in the body of the e-mail."
 }
 
@@ -140,8 +141,9 @@ variable "ncbi_user" {
 }
 
 variable "ncbi_password" {
-  type    = string
-  default = "FTP password for bulk SRA uploads"
+  type        = string
+  default     = ""
+  description = "FTP password for bulk SRA uploads"
 }
 
 variable "help_title" {
