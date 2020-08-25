@@ -3,3 +3,5 @@
 *.tfstate.*
 kubeconfig*
 /api_key.json
+.idea
+/terraform

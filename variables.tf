@@ -15,6 +15,12 @@ variable "image_tag" {
   default = "latest"
 }
 
+variable "create_cloud" {
+  type = bool
+  default = true
+  description = "Create underlying cloud resources"
+}
+
 variable "db_conf" {
   type = object({
     scheme = string

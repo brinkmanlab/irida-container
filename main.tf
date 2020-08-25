@@ -1,6 +1,4 @@
 locals {
-  ansible        = yamldecode(file("${path.root}/vars.yml"))
-  ansible_galaxy = yamldecode(file("${path.root}/galaxy/vars.yml"))
   mail_name      = regex("(?m)^mail.*hostname=(?P<mail_name>[^ ]+)", file("${path.root}/galaxy/inventory.ini")).mail_name
   mail_port      = regex("(?m)^mail.*port=(?P<mail_port>[^ ]+)", file("${path.root}/inventory.ini")).mail_port
   name_suffix    = var.instance != "" ? "-${var.instance}" : ""
@@ -21,23 +19,26 @@ provider "aws" {
   version = "~> 2.0"
 }
 
+module "cloud" {
+  count = var.create_cloud ? 1 : 0
+  source = "git@github.com:brinkmanlab/cloud_recipies.git//aws"
+  cluster_name = "IslandCompare"
+  instance = var.instance
+  debug = local.debug
+}
+
+data "terraform_remote_state" "cloud" {
+  count = var.create_cloud ? 0 : 1
+  backend = "remote"
+  config {
+    # TODO
+  }
+}
+
 module "galaxy_aws" {
   #count = var.destination == "aws" ? 1 : 0
-  source                  = "./galaxy/destinations/aws"
+  source                  = "git@github.com:brinkmanlab/galaxy-container.git//destinations/aws"
   cluster_name            = "irida${local.name_suffix}"
-  uwsgi_port              = local.ansible_galaxy.uwsgi.port
-  web_name                = local.ansible_galaxy.containers.web.name
-  app_name                = local.ansible_galaxy.containers.app.name
-  worker_name             = local.ansible_galaxy.containers.worker.name
-  db_name                 = local.ansible_galaxy.containers.db.name
-  db_data_volume_name     = local.ansible_galaxy.volumes.db_data.name
-  galaxy_root_volume_name = local.ansible_galaxy.volumes.galaxy_root.name
-  user_data_volume_name   = local.ansible_galaxy.volumes.user_data.name
-  data_dir                = local.ansible_galaxy.paths.data
-  root_dir                = local.ansible_galaxy.paths.root
-  config_dir              = local.ansible_galaxy.paths.config
-  galaxy_app_image        = "brinkmanlab/${local.ansible_galaxy.containers.app.name}"
-  galaxy_web_image        = "brinkmanlab/${local.ansible_galaxy.containers.web.name}"
   instance                = var.instance
   galaxy_conf = {
     email_from          = var.email
@@ -110,7 +111,6 @@ module "irida_aws" {
   #count = var.destination == "aws" ? 1 : 0
   source                = "./destinations/aws"
   depends_on            = [module.galaxy_aws.eks]
-  cluster_name          = "irida${local.name_suffix}"
   image_tag             = var.image_tag
   instance              = var.instance
   galaxy_api_key        = jsondecode(data.local_file.api_key.content).api_key
@@ -118,12 +118,6 @@ module "irida_aws" {
   mail_from             = var.email
   mail_user             = module.galaxy_aws.smtp_conf["smtp_username"]
   mail_password         = module.galaxy_aws.smtp_conf["smtp_password"]
-  app_name              = local.ansible.containers.app.name
-  db_name               = local.ansible.containers.db.name
-  data_dir              = local.ansible.paths.data
-  tmp_dir               = local.ansible.paths.tmp
-  user_data_volume_name = local.ansible.volumes.user_data.name
-  db_data_volume_name   = local.ansible.volumes.db_data.name
   base_url               = var.base_url #!= "" ? var.base_url : module.galaxy_aws.endpoint
   nfs_server             = module.galaxy_aws.efs_user_data
   vpc_security_group_ids = [module.galaxy_aws.eks.worker_security_group_id]

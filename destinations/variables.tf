@@ -1,4 +1,14 @@
 locals {
+  ansible        = yamldecode(file("${path.module}/vars.yml"))
+
+  app_name              = local.ansible.containers.app.name
+  db_name               = local.ansible.containers.db.name
+  data_dir              = local.ansible.paths.data
+  tmp_dir               = local.ansible.paths.tmp
+  user_data_volume_name = local.ansible.volumes.user_data.name
+  db_data_volume_name   = local.ansible.volumes.db_data.name
+  irida_image = var.irida_image != null ? var.irida_image : "brinkmanlab/${local.app_name}"
+
   name_suffix = var.instance == "" ? "" : "-${var.instance}"
   db_conf = var.db_conf != null ? var.db_conf : {
     scheme = "mysql"
@@ -51,37 +61,37 @@ variable "instance" {
 
 variable "app_name" {
   type        = string
-  default     = "irida-app"
+  default     = null
   description = "Application container name"
 }
 
 variable "db_name" {
   type        = string
-  default     = "irida-db"
+  default     = null
   description = "Database container name"
 }
 
 variable "user_data_volume_name" {
   type        = string
-  default     = "user-data"
+  default     = null
   description = "User data volume name"
 }
 
 variable "db_data_volume_name" {
   type        = string
-  default     = "db-data"
+  default     = null
   description = "Database volume name"
 }
 
 variable "data_dir" {
   type        = string
-  default     = "data/"
+  default     = null
   description = "Path to user data within container"
 }
 
 variable "tmp_dir" {
   type        = string
-  default     = "/tmp"
+  default     = null
   description = "Path to mount temporary space into container"
 }
 
@@ -190,7 +200,7 @@ variable "db_conf" {
 
 variable "irida_image" {
   type        = string
-  default     = "brinkmanlab/irida-app"
+  default     = null
   description = "IRIDA application image name"
 }
 

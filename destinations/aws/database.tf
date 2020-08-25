@@ -1,5 +1,5 @@
 resource "aws_db_instance" "irida_db" {
-  identifier            = "${var.db_name}${local.name_suffix}"
+  identifier            = "${local.db_name}${local.name_suffix}"
   allocated_storage     = 20
   max_allocated_storage = 100
   storage_type          = "gp2"

@@ -3,11 +3,6 @@ locals {
   instance = var.instance == "" ? "default" : var.instance
 }
 
-variable "cluster_name" {
-  type    = string
-  default = "irida-cluster"
-}
-
 variable "nfs_server" {
   type        = string
   description = "URL to NFS server containing user data"

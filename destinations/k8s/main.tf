@@ -1,13 +1,13 @@
 resource "kubernetes_deployment" "irida" {
-  wait_for_rollout = false
+  wait_for_rollout = !var.debug
   for_each         = local.profiles
   metadata {
-    name      = "${var.app_name}-${each.key}"
+    name      = "${local.app_name}-${each.key}"
     namespace = local.instance
     labels = {
-      App                          = "${var.app_name}-${each.key}"
-      "app.kubernetes.io/name"     = "${var.app_name}-${each.key}"
-      "app.kubernetes.io/instance" = "${var.app_name}-${each.key}"
+      App                          = "${local.app_name}-${each.key}"
+      "app.kubernetes.io/name"     = "${local.app_name}-${each.key}"
+      "app.kubernetes.io/instance" = "${local.app_name}-${each.key}"
       #"app.kubernetes.io/version" = TODO
       "app.kubernetes.io/component"  = each.key
       "app.kubernetes.io/part-of"    = "irida"
@@ -23,18 +23,18 @@ resource "kubernetes_deployment" "irida" {
     }
     selector {
       match_labels = {
-        App = "${var.app_name}-${each.key}"
+        App = "${local.app_name}-${each.key}"
       }
     }
     template {
       metadata {
         labels = {
-          App = "${var.app_name}-${each.key}"
+          App = "${local.app_name}-${each.key}"
         }
       }
       spec {
         container {
-          image = "${var.irida_image}:${var.image_tag}"
+          image = "${local.irida_image}:${var.image_tag}"
           name  = "irida-${each.key}"
           env {
             name  = "JAVA_OPTS"
@@ -52,11 +52,11 @@ resource "kubernetes_deployment" "irida" {
             }
           }
           volume_mount {
-            mount_path = var.tmp_dir
+            mount_path = local.tmp_dir
             name       = "tmp"
           }
           volume_mount {
-            mount_path = var.data_dir
+            mount_path = local.data_dir
             name       = "data"
           }
         }
@@ -100,12 +100,12 @@ resource "kubernetes_deployment" "irida" {
 
 resource "kubernetes_service" "irida" {
   metadata {
-    name      = var.app_name
+    name      = local.app_name
     namespace = local.instance
   }
   spec {
     selector = {
-      App = "${var.app_name}-front"
+      App = "${local.app_name}-front"
     }
     port {
       protocol    = "TCP"
