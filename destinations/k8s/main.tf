@@ -1,118 +1,30 @@
-resource "kubernetes_deployment" "irida" {
-  wait_for_rollout = !var.debug
-  for_each         = local.profiles
-  metadata {
-    name      = "${local.app_name}-${each.key}"
-    namespace = local.instance
-    labels = {
-      App                          = "${local.app_name}-${each.key}"
-      "app.kubernetes.io/name"     = "${local.app_name}-${each.key}"
-      "app.kubernetes.io/instance" = "${local.app_name}-${each.key}"
-      #"app.kubernetes.io/version" = TODO
-      "app.kubernetes.io/component"  = each.key
-      "app.kubernetes.io/part-of"    = "irida"
-      "app.kubernetes.io/managed-by" = "terraform"
-    }
-  }
+module "galaxy" {
+  source = "../galaxy"
 
-  spec {
-    replicas          = lookup(local.replicates, each.key, 1)
-    min_ready_seconds = 1
-    strategy {
-      type = "Recreate"
-    }
-    selector {
-      match_labels = {
-        App = "${local.app_name}-${each.key}"
-      }
-    }
-    template {
-      metadata {
-        labels = {
-          App = "${local.app_name}-${each.key}"
-        }
-      }
-      spec {
-        container {
-          image = "${local.irida_image}:${var.image_tag}"
-          name  = "irida-${each.key}"
-          env {
-            name  = "JAVA_OPTS"
-            value = "-D${join(" -D", compact(local.irida_config))} -Dspring.profiles.active=${join(",", each.value)}"
-          }
-
-          resources {
-            limits {
-              cpu    = "2"
-              memory = "2Gi"
-            }
-            requests {
-              cpu    = "1"
-              memory = "1Gi"
-            }
-          }
-          volume_mount {
-            mount_path = local.tmp_dir
-            name       = "tmp"
-          }
-          volume_mount {
-            mount_path = local.data_dir
-            name       = "data"
-          }
-        }
-        node_selector = {
-          WorkClass = "service"
-        }
-        volume {
-          name = "tmp"
-          empty_dir {}
-        }
-        volume {
-          name = "data"
-          persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.user_data.metadata.0.name
-          }
-        }
-        # TODO Configure
-        # https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#volume-2
-      }
-    }
-  }
-}
-
-#resource "kubernetes_horizontal_pod_autoscaler" "irida" {
-#  for_each = local.profiles
-#  metadata {
-#    name = "irida${var.name_suffix}-${each.key}"
-#  }
-#
-#  spec {
-#    max_replicas = 10
-#    min_replicas = 1
-#
-#    scale_target_ref {
-#      kind = "Deployment"
-#      name = "${var.app_name}${var.name_suffix}-${each.key}"
-#    }
-#  }
-#}
-
-
-resource "kubernetes_service" "irida" {
-  metadata {
-    name      = local.app_name
-    namespace = local.instance
-  }
-  spec {
-    selector = {
-      App = "${local.app_name}-front"
-    }
-    port {
-      protocol    = "TCP"
-      port        = 80
-      target_port = 80
-    }
-
-    type = "LoadBalancer" # https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
-  }
+  irida_image           = var.irida_image
+  image_tag             = var.image_tag
+  db_conf               = local.db_conf
+  instance              = var.instance
+  base_url              = var.base_url
+  galaxy_api_key        = var.galaxy_api_key
+  galaxy_user_email     = var.galaxy_user_email
+  mail_from             = var.mail_from
+  mail_password         = var.mail_password
+  mail_user             = var.mail_user
+  app_name              = local.app_name
+  db_name               = local.db_name
+  data_dir              = local.data_dir
+  tmp_dir               = local.tmp_dir
+  user_data_volume_name = local.user_data_volume_name
+  db_data_volume_name   = local.db_data_volume_name
+  analysis_warning      = var.analysis_warning
+  help_email            = var.help_email
+  help_title            = var.help_title
+  help_url              = var.help_url
+  hide_workflows        = var.hide_workflows
+  ncbi_user             = var.ncbi_user
+  ncbi_password         = var.ncbi_password
+  front_replicates      = var.front_replicates
+  processing_replicates = var.processing_replicates
+  debug                 = var.debug
 }

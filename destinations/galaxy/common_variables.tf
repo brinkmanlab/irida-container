@@ -13,7 +13,6 @@ locals {
   user_data_volume_name = local.ansible.volumes.user_data.name
   db_data_volume_name   = local.ansible.volumes.db_data.name
 
-  irida_image = var.irida_image != null ? var.irida_image : "brinkmanlab/${local.app_name}"
   irida_uid             = local.ansible.irida.uid
   irida_gid             = local.ansible.irida.gid
 
@@ -74,37 +73,37 @@ variable "instance" {
 
 variable "app_name" {
   type        = string
-  default     = null
+  default     = "irida-app"
   description = "Application container name"
 }
 
 variable "db_name" {
   type        = string
-  default     = null
+  default     = "irida-db"
   description = "Database container name"
 }
 
 variable "user_data_volume_name" {
   type        = string
-  default     = null
+  default     = "user-data"
   description = "User data volume name"
 }
 
 variable "db_data_volume_name" {
   type        = string
-  default     = null
+  default     = "db-data"
   description = "Database volume name"
 }
 
 variable "data_dir" {
   type        = string
-  default     = null
+  default     = "/data"
   description = "Path to user data within container"
 }
 
 variable "tmp_dir" {
   type        = string
-  default     = null
+  default     = "/tmp"
   description = "Path to mount temporary space into container"
 }
 
@@ -225,7 +224,7 @@ variable "db_conf" {
 
 variable "irida_image" {
   type        = string
-  default     = null
+  default     = "brinkmanlab/irida-app"
   description = "IRIDA application image name"
 }
 

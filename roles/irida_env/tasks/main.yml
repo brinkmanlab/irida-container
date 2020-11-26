@@ -1,0 +1,29 @@
+---
+- name: Add group
+  group:
+    name: irida
+    gid: '{{ irida.gid }}'
+
+- name: Add user
+  user:
+    name: irida
+    group: irida
+    uid: '{{ irida.uid }}'
+    shell: /sbin/nologin
+
+- name: Set tomcat permissions
+  file:
+    path: /usr/local/tomcat
+    group: irida
+    owner: irida
+    recurse: yes
+
+- name: Create paths
+  file:
+    path: "{{ item }}"
+    recurse: yes
+    state: directory
+    mode: ug=rwx,o=rx,g+s
+    owner: irida
+    group: irida
+  loop: "{{ paths.values() | list }}"

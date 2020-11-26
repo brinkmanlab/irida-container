@@ -23,6 +23,9 @@
     --env {{ k }}={{ v }}
     {% endfor %}
     {% endif %}
+    {% if user is defined %}
+    --user '{{ user }}'
+    {% endif %}
     {{ container_handle.stdout }}
 
 - name: Add application container to inventory

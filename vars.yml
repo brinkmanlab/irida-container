@@ -4,13 +4,17 @@ url: https://github.com/brinkmanlab/
 vendor: Brinkman Lab
 
 irida:
-  version: 20.05.2
+  version: 20.09.3
+  uid: 1000
+  gid: 1000
 
 containers:
   app:
     name: irida-app  # Must be valid hostname (no underscores)
+    image: brinkmanlab/irida-app
   db:
     name: irida-db  # Must be valid hostname (no underscores)
+    image: mariadb
   galaxy:
     name: galaxy-web  # Must be valid hostname (no underscores)
 
@@ -21,10 +25,10 @@ volumes:
     name: db-data
 
 paths:
-  data: /data
-  sequences: /data/sequences
-  reference: /data/reference
-  output: /data/output
-  assembly: /data/assembly
+  data: /irida
+  sequences: /irida/sequences
+  reference: /irida/reference
+  output: /irida/output
+  assembly: /irida/assembly
   tmp: /tmp
   config: /etc/irida

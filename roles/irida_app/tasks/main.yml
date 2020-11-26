@@ -1,11 +1,4 @@
 ---
-- name: Create paths
-  file:
-    path: "{{ item }}"
-    recurse: yes
-    state: directory
-  loop: "{{ paths.values() | list }}"
-
 - name: Configure server
   xml:
     path: /usr/local/tomcat/conf/server.xml
@@ -18,7 +11,7 @@
       value: "{{ paths.tmp }}/tomcat/"
     - xpath: /Server/Service/Connector
       attribute: port
-      value: "80"
+      value: "8080"
 
 - name: Generate irida.conf
   template:

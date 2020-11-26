@@ -1,3 +1,5 @@
+resource "time_static" "now" {}
+
 resource "aws_db_instance" "irida_db" {
   identifier            = "${local.db_name}${local.name_suffix}"
   allocated_storage     = 20
@@ -13,8 +15,8 @@ resource "aws_db_instance" "irida_db" {
   vpc_security_group_ids    = var.vpc_security_group_ids
   db_subnet_group_name      = var.db_subnet_group_name
   publicly_accessible       = false
-  skip_final_snapshot       = true # TODO temporary, don't need to make snapshots while debugging
-  final_snapshot_identifier = local.db_conf.name
+  skip_final_snapshot       = var.debug
+  final_snapshot_identifier = "${local.db_conf.name}-${formatdate("YYYYMMDDhhmmss", time_static.now.rfc3339)}"
 }
 
 ## Register database in internal DNS
