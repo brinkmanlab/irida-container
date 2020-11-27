@@ -2,7 +2,10 @@
 
 The repository contains everything needed to build a container for IRIDA and deploy to a cloud resource.
 Example deployments are provided in the `./deployment` folder for various destinations. For production use, it is
-recommended to create your own deployment recipe using the terraform modules provided in `./desinations`.
+recommended to create your own deployment recipe using the terraform modules provided in `./desinations`. Terraform
+is the deployment manager software used for all deployment destinations.
+
+To install terraform, check that your systems package manager provides it or download it from [here](https://www.terraform.io/downloads.html).
 
 ## Run local
 Change the current working directory to `./deployment/docker`.
