@@ -19,6 +19,9 @@ terraform init
 ./deploy.sh
 ```
 
+For OSX, to get around a permissions issue, you need to run `sudo chmod 777 /var/run/docker.sock`. 
+Run `sudo chmod 755 /var/run/docker.sock` after `./destroy.sh` to restore your system to its previous state.
+
 Browse to http://localhost:8081/ to access the deployment. If you want to access Galaxy directly, it is assigned a random port.
 Run `docker ps` to list the running containers, you should see the galaxy-web container with a port exported on 0.0.0.0.
 
@@ -32,8 +35,11 @@ and that the required environment variables are set for the respective terraform
 
 ### AWS
 
-IRIDA is deployed into a AWS EKS cluster. To access the cluster install aws-iam-authenticator.
-Run `aws-iam-authenticator token -i irida --token-only` to get the required token for the dashboard.
+Install the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) and [aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html).
+IRIDA is deployed into a AWS EKS cluster. Run `aws-iam-authenticator token -i irida --token-only` to get the required token for the dashboard.
+
+Configure `kubectl` by running `aws eks --region us-west-2 update-kubeconfig --name irida`.
+
 Refer to the Kubernetes section for the remaining information.
 
 ### Azure
@@ -41,11 +47,11 @@ Refer to the Kubernetes section for the remaining information.
 ### Kubernetes
 
 All cloud deployments include a dashboard server that provides administrative control of the cluster.
-To access it, install kubectl and run `kubectl proxy` in a separate terminal.
+To access it, [install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) and run `kubectl proxy` in a separate terminal.
 Visit [here](http://localhost:8001/api/v1/namespaces/kube-system/services/https:dashboard-chart-kubernetes-dashboard:https/proxy/#/login) to
 access the dashboard.
 
-To check the state of the cluster run `kubectl describe node --kubeconfig kubeconfig_irida-cluster`.
+To check the state of the cluster run `kubectl describe node`.
 
 ### Existing Kubernetes cluster
 
@@ -73,7 +79,7 @@ Buildah and ansible are the tools used to generate the containers. The relevant 
 
 * `./roles` - Ansible roles applied to the container
 * `./irida.playbook.yml` - Run this to begin building the container
-* `./irida` - IRIDA sub repository
+* `./irida` - IRIDA sub repository, initialise it by running `git submodule update --init`
 * `./buildah_to_*.sh` - Push the built container to the local docker daemon or docker hub
 * `./vars.yml` - Various configuration options for the container build process. Also imported by the deployment recipes.
 
