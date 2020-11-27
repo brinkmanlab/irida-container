@@ -1,6 +1,3 @@
 [submodule "irida"]
 	path = irida
 	url = git@github.com:phac-nml/irida.git
-[submodule "galaxy"]
-	path = galaxy
-	url = git@github.com:brinkmanlab/galaxy-container.git
