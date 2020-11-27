@@ -23,6 +23,7 @@ module "galaxy" {
       read_only = false
     }
   ]
+  extra_job_mounts = ["${docker_volume.user_data.name}:/irida:ro"]
 }
 
 module "admin_user" {
