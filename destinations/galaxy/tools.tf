@@ -1,10 +1,10 @@
 locals {
   repos = yamldecode(data.local_file.tool_list.content)["tools"]
-  duplicates = ["toolshed.g2.bx.psu.edu/repos/nml/bundle_collections"]
+  duplicates = ["toolshed.g2.bx.psu.edu/repos/nml/bundle_collections/705ebd286b57"]
 }
 
 resource "docker_image" "irida" {
-  name = "${var.irida_image}:${var.image_tag}"
+  name = "${local.irida_image}:${var.image_tag}"
 }
 
 resource "docker_container" "tool_list" {
@@ -27,7 +27,7 @@ data "local_file" "tool_list" {
 }
 
 resource "galaxy_repository" "repositories" {
-  for_each = { for k, v in zipmap([for repo in local.repos: "${regex("(?:https?://)?([^/]+)", repo.tool_shed_url)[0]}/repos/${repo.owner}/${repo.name}"], local.repos): k => v if !contains(local.duplicates, k) }
+  for_each = { for k, v in zipmap([for repo in local.repos: "${regex("(?:https?://)?([^/]+)", repo.tool_shed_url)[0]}/repos/${repo.owner}/${repo.name}/${repo.revisions[0]}"], local.repos): k => v if !contains(local.duplicates, k) }
   tool_shed = regex("(?:https?://)?([^/]+)", each.value.tool_shed_url)[0]
   owner = each.value.owner
   name = each.value.name

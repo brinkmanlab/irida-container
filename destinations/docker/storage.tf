@@ -4,11 +4,11 @@ locals {
 
 resource "docker_volume" "user_data" {
   count = var.user_data_volume == null ? 1 : 0
-  name = "${var.user_data_volume_name}${local.name_suffix}"
+  name = "${local.user_data_volume_name}${local.name_suffix}"
 }
 
 resource "docker_volume" "db_data" {
-  name = "${var.db_data_volume_name}${local.name_suffix}"
+  name = "${local.db_data_volume_name}${local.name_suffix}"
 }
 
 resource "docker_container" "init_data" {

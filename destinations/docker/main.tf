@@ -8,7 +8,7 @@ resource "docker_network" "irida_network" {
 }
 
 resource "docker_image" "irida_app" {
-  name = "${var.irida_image}:${var.image_tag}"
+  name = "${local.irida_image}:${var.image_tag}"
 }
 
 module "galaxy" {
