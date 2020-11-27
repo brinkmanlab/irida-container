@@ -1,60 +1,74 @@
 # IRIDA Container and deployment
 
-## Build
-
-To build the containers, ensure you have buildah, docker, terraform, and ansible-playbook installed and configured.
-Ensure docker can be [run without root privileges](https://docs.docker.com/engine/install/linux-postinstall/).
-
-Run `./webserver.playbook.yml` and `./application.playbook.yml` to build the containers.
+The repository contains everything needed to build a container for IRIDA and deploy to a cloud resource.
+Example deployments are provided in the `./deployment` folder for various destinations. For production use, it is
+recommended to create your own deployment recipe using the terraform modules provided in `./desinations`.
 
 ## Run local
-If you do not build the containers, they will be pulled from docker hub automatically.
-Run `./buildah_to_docker.sh` to push the built containers to your local docker instance for testing.
-Or modify `./changeme.auto.tfvars` to refer to the most recent image tag to pull from docker hub.
+Change the current working directory to `./deployment/docker`.
+Modify `./changeme.auto.tfvars` with any custom values you like.
 
 Run the following to start an instance on your local computer using docker:
 ```shell script
 terraform init
-terraform plan  # Ensure the plan shows no errors
-terraform apply  # Ensure apply ran without error
+./deploy.sh
 ```
 
-To shut down this instance, run `terraform destroy`. This will delete the instance, all of its data, and the images
-pushed to docker.
+To shut down this instance, run `./destroy.sh`. This will delete the instance, all of its data, and the container images.
 
 ## Deploy to cloud
 
 Several terraform destinations have been configured. Select one from the `./destinations/` folder that you wish to use.
-Modify `./main.tf` to refer to that destination and provide any necessary provider configuration.
-Currently terraform does not support optional providers and so this has to be a manual process.
-
+Modify `./changeme.auto.tfvars` with any custom values you like. Ensure you are authenticated with your cloud provider
+and that the required environment variables are set for the respective terraform provider.
 
 ### AWS
 
-After running `terraform apply` it generates a kubeconfig file allowing you to run kubectl commands on the kubernetes cluster.
-Install kubectl, aws-iam-authenticator, and `export KUBECONFIG=./kubeconfig_irida`. Run `kubectl proxy`.
-`kubectl apply --kubeconfig kubeconfig_irida -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml`
-Visit [here](http://localhost:8001/api/v1/namespaces/kube-system/services/https:dashboard-chart-kubernetes-dashboard:https/proxy/#/login) to
-access the dashboard. The `kubeconfig_irida` file does not include the 
-[token required for authentication](https://github.com/kubernetes/dashboard/issues/2474#issuecomment-348811806). 
-Run `aws-iam-authenticator token -i irida --token-only` to get the required token.
-
-### Kubernetes
-
-To check the state of the cluster run `kubectl describe node --kubeconfig kubeconfig_irida-cluster`.
-
-
+IRIDA is deployed into a AWS EKS cluster. To access the cluster install aws-iam-authenticator.
+Run `aws-iam-authenticator token -i irida --token-only` to get the required token for the dashboard.
+Refer to the Kubernetes section for the remaining information.
 
 ### Azure
 
+### Kubernetes
+
+All cloud deployments include a dashboard server that provides administrative control of the cluster.
+To access it, install kubectl and run `kubectl proxy` in a separate terminal.
+Visit [here](http://localhost:8001/api/v1/namespaces/kube-system/services/https:dashboard-chart-kubernetes-dashboard:https/proxy/#/login) to
+access the dashboard.
+
+To check the state of the cluster run `kubectl describe node --kubeconfig kubeconfig_irida-cluster`.
+
 ### Existing Kubernetes cluster
 
+Configure the Kubernetes terraform provider and deploy the `./destinations/k8s` module.
+
 ### Existing Nomad cluster
+
+Configure the Nomad terraform provider and deploy the `./destinations/nomad` module.
+
+## Build container
+To build the containers, ensure you have buildah, docker, terraform, and ansible-playbook installed and configured.
+Ensure docker can be [run without root privileges](https://docs.docker.com/engine/install/linux-postinstall/).
+
+Run `./irida.playbook.yml` to build the container.
+Run `./buildah_to_docker.sh` to push the built containers to your local docker instance for testing.
 
 ## Project layout
 
 ### Container generation
 
+Buildah and ansible are the tools used to generate the containers. The relevant paths are:
 
+* `./roles` - Ansible roles applied to the container
+* `./irida.playbook.yml` - Run this to begin building the container
+* `./irida` - IRIDA sub repository
+* `./buildah_to_*.sh` - Push the built container to the local docker daemon or docker hub
+* `./vars.yml` - Various configuration options for the container build process. Also imported by the deployment recipes.
 
 ### Deployment
+
+Terraform is used to deploy the various resources needed to run IRIDA to the cloud provider of choice.
+
+* `./destinations` - Terraform modules responsible for deployment into the various providers
+* `./deployment` - Usage examples for the destination modules
