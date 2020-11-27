@@ -7,6 +7,8 @@ is the deployment manager software used for all deployment destinations.
 
 To install terraform, check that your systems package manager provides it or download it from [here](https://www.terraform.io/downloads.html).
 
+IRIDAs default username and password is `admin` and `password1` respectively.
+
 ## Run local
 Change the current working directory to `./deployment/docker`.
 Modify `./changeme.auto.tfvars` with any custom values you like.
