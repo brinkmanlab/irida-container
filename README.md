@@ -54,6 +54,9 @@ Configure the Nomad terraform provider and deploy the `./destinations/nomad` mod
 To build the containers, ensure you have buildah, docker, terraform, and ansible-playbook installed and configured.
 Ensure docker can be [run without root privileges](https://docs.docker.com/engine/install/linux-postinstall/).
 
+You do not need to build the containers to deploy an instance of IRIDA. Rebuilding the container is only needed if you want to
+customise them. There are pre-built containers already published to docker hub that work for most use cases.
+
 Run `./irida.playbook.yml` to build the container.
 Run `./buildah_to_docker.sh` to push the built containers to your local docker instance for testing.
 
