@@ -10,17 +10,15 @@ To install terraform, check that your systems package manager provides it or dow
 IRIDAs default username and password is `admin` and `password1` respectively.
 
 ## Run local
-Change the current working directory to `./deployment/docker`.
-Modify `./changeme.auto.tfvars` with any custom values you like.
+Change the current working directory to `./deployment/docker`. Modify `./changeme.auto.tfvars` with any custom values you like.
+You must at least set the `docker_gid` variable to a group id with write access to `/var/run/docker.sock`.
+Run `ls -n /var/run/docker.sock` to show the owning group id.
 
 Run the following to start an instance on your local computer using docker:
 ```shell script
 terraform init
 ./deploy.sh
 ```
-
-For OSX, to get around a permissions issue, you need to run `sudo chmod 777 /var/run/docker.sock`. 
-Run `sudo chmod 755 /var/run/docker.sock` after `./destroy.sh` to restore your system to its previous state.
 
 Browse to http://localhost:8081/ to access the deployment. If you want to access Galaxy directly, it is assigned a random port.
 Run `docker ps` to list the running containers, you should see the galaxy-web container with a port exported on 0.0.0.0.

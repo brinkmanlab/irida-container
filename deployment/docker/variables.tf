@@ -19,3 +19,8 @@ variable "host_port" {
   type = number
   description = "Host port to expose galaxy service"
 }
+
+variable "docker_gid" {
+  type = number
+  description = "GID with write permission to /var/run/docker.sock"
+}
