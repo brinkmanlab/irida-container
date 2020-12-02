@@ -9,5 +9,6 @@ terraform apply -target=module.irida.module.galaxy.data.local_file.tool_list -au
 # -parallelism=1 due to https://github.com/galaxyproject/galaxy/issues/10651
 terraform apply -target=module.irida -auto-approve -parallelism=1
 terraform apply -auto-approve
+terraform output -json
 
 echo "Run destroy.sh to shutdown and delete everything"
