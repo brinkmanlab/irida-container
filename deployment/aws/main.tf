@@ -76,6 +76,14 @@ module "galaxy" {
   nfs_server = module.galaxy-storage.nfs_server
   extra_job_mounts = module.irida-storage.extra_job_mounts
   extra_mounts = module.irida-storage.extra_mounts
+  tool_mappings = {
+    shovill = "c1m2"
+  }
+}
+
+provider "galaxy" {
+  host    = "http://${module.galaxy.endpoint}"
+  apikey = module.admin_user.api_key
 }
 
 module "admin_user" {
@@ -84,11 +92,6 @@ module "admin_user" {
   galaxy_url     = "http://${module.galaxy.endpoint}"
   master_api_key = module.galaxy.master_api_key
   username       = "admin"
-}
-
-provider "galaxy" {
-  host    = "http://${module.galaxy.endpoint}"
-  apikey = module.admin_user.api_key
 }
 
 module "irida" {
