@@ -1,3 +1,15 @@
+locals {
+  base_url = var.base_url != "" ? var.base_url : kubernetes_service.irida.load_balancer_ingress.0.hostname
+  namespace = var.namespace != null ? var.namespace : kubernetes_namespace.instance[0]
+}
+
+resource "kubernetes_namespace" "instance" {
+  count = var.namespace == null ? 1 : 0
+  metadata {
+    name = local.instance
+  }
+}
+
 module "galaxy" {
   source = "../galaxy"
 

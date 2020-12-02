@@ -2,7 +2,7 @@ resource "kubernetes_deployment" "irida_front" {
   wait_for_rollout = true
   metadata {
     name      = "${local.app_name}-front"
-    namespace = local.instance
+    namespace = local.namespace.metadata.0.name
     labels = {
       App                          = "${local.app_name}-front"
       "app.kubernetes.io/name"     = "${local.app_name}-front"
@@ -108,7 +108,7 @@ resource "kubernetes_deployment" "irida_front" {
 resource "kubernetes_service" "irida" {
   metadata {
     name      = local.app_name
-    namespace = local.instance
+    namespace = local.namespace.metadata.0.name
     annotations = var.lb_annotations
   }
   spec {

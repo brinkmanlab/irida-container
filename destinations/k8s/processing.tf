@@ -3,7 +3,7 @@ resource "kubernetes_deployment" "irida_processing" {
   depends_on = [kubernetes_deployment.irida_front]
   metadata {
     name      = "${local.app_name}-processing"
-    namespace = local.instance
+    namespace = local.namespace.metadata.0.name
     labels = {
       App                          = "${local.app_name}-processing"
       "app.kubernetes.io/name"     = "${local.app_name}-processing"

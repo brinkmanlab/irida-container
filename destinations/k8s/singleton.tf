@@ -3,7 +3,7 @@ resource "kubernetes_deployment" "irida_singleton" {
   depends_on = [kubernetes_deployment.irida_front]
   metadata {
     name      = "${local.app_name}-singleton"
-    namespace = local.instance
+    namespace = local.namespace.metadata.0.name
     labels = {
       App                          = "${local.app_name}-singleton"
       "app.kubernetes.io/name"     = "${local.app_name}-singleton"

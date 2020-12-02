@@ -2,7 +2,7 @@ resource "kubernetes_job" "init_nfs" {
   # Make directories on NFS for instance
   metadata {
     generate_name = "init-nfs-irida-"
-    namespace     = local.instance
+    namespace     = var.namespace.metadata.0.name
   }
   spec {
     template {

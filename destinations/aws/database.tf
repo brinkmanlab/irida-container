@@ -23,7 +23,7 @@ resource "aws_db_instance" "irida_db" {
 resource "kubernetes_service" "irida_db" {
   metadata {
     name      = local.db_conf.host
-    namespace = local.instance
+    namespace = local.namespace.metadata.0.name
   }
   spec {
     type          = "ExternalName"

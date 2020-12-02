@@ -15,3 +15,8 @@ variable "vpc_security_group_ids" {
 variable "db_subnet_group_name" {
   type = string
 }
+
+variable "namespace" {
+  default = null
+  description = "Instance of kubernetes_namespace to provision instance resources under"
+}
