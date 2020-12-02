@@ -61,6 +61,7 @@ module "irida-storage" {
 module "galaxy" {
   source   = "github.com/brinkmanlab/galaxy-container.git//destinations/aws"
   instance = var.instance
+  namespace = kubernetes_namespace.instance
   galaxy_conf = {
     require_login       = true
     allow_user_creation = false
