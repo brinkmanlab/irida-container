@@ -14,15 +14,31 @@
       value: "8080"
 
 - name: Generate irida.conf
+  vars:
+    config: "{{ irida.config }}"
   template:
-    src: irida.conf.j2
+    src: conf.j2
     dest: "{{ paths.config }}/irida.conf"
     mode: u=rw,g=r,o=r
 
+- name: Dump irida config to yaml
+  copy:
+    content: "{{ irida.config | to_nice_yaml }}"
+    dest: "{{ paths.config }}/irida_conf.yml"
+    mode: u=rw,g=r,o=r
+
 - name: Generate web.conf
+  vars:
+    config: "{{ irida.web }}"
   template:
-    src: web.conf.j2
+    src: conf.j2
     dest: "{{ paths.config }}/web.conf"
+    mode: u=rw,g=r,o=r
+
+- name: Dump web config to yaml
+  copy:
+    content: "{{ irida.web | to_nice_yaml }}"
+    dest: "{{ paths.config }}/web_conf.yml"
     mode: u=rw,g=r,o=r
 
 - name: Import irida.war

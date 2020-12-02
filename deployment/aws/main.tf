@@ -99,9 +99,13 @@ module "irida" {
   image_tag              = "dev"
   galaxy_api_key         = module.admin_user.api_key
   galaxy_user_email      = var.email
-  mail_from              = var.email
-  mail_user              = module.galaxy.smtp_conf["smtp_username"]
-  mail_password          = module.galaxy.smtp_conf["smtp_password"]
+  mail_config = {
+    host = split(":", module.galaxy.smtp_conf.smtp_server)[0]
+    port = split(":", module.galaxy.smtp_conf.smtp_server)[1]
+    username = module.galaxy.smtp_conf.smtp_username
+    password = module.galaxy.smtp_conf.smtp_password
+    from = var.email
+  }
   base_url               = var.base_url #!= "" ? var.base_url : module.galaxy.endpoint
   claim_name             = module.irida-storage.claim_name
   vpc_security_group_ids = [module.cloud.eks.worker_security_group_id]

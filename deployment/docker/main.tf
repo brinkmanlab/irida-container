@@ -48,9 +48,6 @@ module "irida" {
   image_tag              = "dev"
   galaxy_api_key         = module.admin_user.api_key
   galaxy_user_email      = var.email
-  mail_from              = var.email
-  mail_user              = ""
-  mail_password          = ""
   base_url               = var.base_url #!= "" ? var.base_url : module.galaxy.endpoint
   #ncbi_user = ""
   #ncbi_password = ""

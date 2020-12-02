@@ -1,0 +1,6 @@
+---
+irida:
+  web:
+    mail.server.host: "{{ hostvars['mail'].hostname }}"
+    mail.server.protocol: "{{ hostvars['mail'].protocol }}"
+    mail.server.port: "{{ hostvars['mail'].port }}"

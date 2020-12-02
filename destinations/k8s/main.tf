@@ -10,6 +10,18 @@ resource "kubernetes_namespace" "instance" {
   }
 }
 
+resource "kubernetes_secret" "config" {
+  metadata {
+    generate_name = "irida-config-"
+    namespace = local.namespace.metadata.0.name
+  }
+  type = "Opaque"
+  data = {
+    "irida.conf" = local.irida_config
+    "web.conf" = local.web_config
+  }
+}
+
 module "galaxy" {
   source = "../galaxy"
 
@@ -20,22 +32,16 @@ module "galaxy" {
   base_url              = var.base_url
   galaxy_api_key        = var.galaxy_api_key
   galaxy_user_email     = var.galaxy_user_email
-  mail_from             = var.mail_from
-  mail_password         = var.mail_password
-  mail_user             = var.mail_user
+  mail_config           = local.mail_config
+  irida_config          = local.irida_config
+  web_config            = local.web_config
   app_name              = local.app_name
   db_name               = local.db_name
   data_dir              = local.data_dir
   tmp_dir               = local.tmp_dir
   user_data_volume_name = local.user_data_volume_name
   db_data_volume_name   = local.db_data_volume_name
-  analysis_warning      = var.analysis_warning
-  help_email            = var.help_email
-  help_title            = var.help_title
-  help_url              = var.help_url
   hide_workflows        = var.hide_workflows
-  ncbi_user             = var.ncbi_user
-  ncbi_password         = var.ncbi_password
   front_replicates      = var.front_replicates
   processing_replicates = var.processing_replicates
   debug                 = var.debug

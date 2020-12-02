@@ -8,7 +8,10 @@ output "galaxy_admin_api_key" {
   sensitive = true
 }
 
-output "db_root" {
-  value = module.irida.db_root
-  sensitive = true
+output "galaxy_endpoint" {
+  value = module.galaxy.endpoint
+}
+
+output "endpoint" {
+  value = module.irida.endpoint
 }

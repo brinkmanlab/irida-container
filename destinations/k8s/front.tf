@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "irida_front" {
           name  = "irida-front"
           env {
             name  = "JAVA_OPTS"
-            value = "-D${join(" -D", compact(local.irida_config))} -Dspring.profiles.active=${join(",", local.profiles.front)}"
+            value = "-Dspring.profiles.active=${join(",", local.profiles.front)}"
           }
 
           readiness_probe {
@@ -66,6 +66,11 @@ resource "kubernetes_deployment" "irida_front" {
             mount_path = local.data_dir
             name       = "data"
           }
+          volume_mount {
+            mount_path = local.config_dir
+            name = "config"
+            read_only = true
+          }
         }
         node_selector = {
           WorkClass = "service"
@@ -80,7 +85,12 @@ resource "kubernetes_deployment" "irida_front" {
             claim_name = var.claim_name
           }
         }
-        # TODO Configure
+        volume {
+          name = "config"
+          secret {
+            secret_name = kubernetes_secret.config.metadata.0.name
+          }
+        }
         # https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#volume-2
       }
     }

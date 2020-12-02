@@ -1,24 +1,22 @@
 locals {
   ansible        = yamldecode(file("${path.module}/../../vars.yml"))
 
-  app_name              = local.ansible.containers.app.name
-  db_name               = local.ansible.containers.db.name
-  data_dir              = local.ansible.paths.data
+  app_name              = var.app_name != null ? var.app_name : local.ansible.containers.app.name
+  db_name               = var.db_name  != null ? var.db_name  : local.ansible.containers.db.name
+  data_dir              = var.data_dir != null ? var.data_dir : local.ansible.paths.data
+  galaxy_name           = local.ansible.containers.galaxy.name
   reference_dir         = local.ansible.paths.reference
   sequences_dir         = local.ansible.paths.sequences
   output_dir            = local.ansible.paths.output
   assembly_dir          = local.ansible.paths.assembly
   config_dir            = local.ansible.paths.config
   tmp_dir               = local.ansible.paths.tmp
-  user_data_volume_name = local.ansible.volumes.user_data.name
-  db_data_volume_name   = local.ansible.volumes.db_data.name
+  user_data_volume_name = var.user_data_volume_name != null ? var.user_data_volume_name : local.ansible.volumes.user_data.name
+  db_data_volume_name   = var.db_data_volume_name   != null ? var.db_data_volume_name   : local.ansible.volumes.db_data.name
 
   irida_image = var.irida_image != null ? var.irida_image : "brinkmanlab/${local.app_name}"
   irida_uid             = local.ansible.irida.uid
   irida_gid             = local.ansible.irida.gid
-
-  mail_name   = var.mail_name != null ? var.mail_name : regex("(?m)^mail.*hostname=(?P<mail_name>[^ ]+)", file("${path.module}/../../inventory.ini")).mail_name
-  mail_port   = var.mail_port != null ? var.mail_port : regex("(?m)^mail.*port=(?P<mail_port>[^ ]+)", file("${path.root}/../../inventory.ini")).mail_port
 
   name_suffix = var.instance == "" ? "" : "-${var.instance}"
 
@@ -29,35 +27,44 @@ locals {
     user   = "irida"
     pass   = random_password.db_password[0].result
   }
+
+  mail_config = var.mail_config != null ? var.mail_config : {
+    host = regex("(?m)^mail.*hostname=(?P<mail_name>[^ ]+)", file("${path.module}/../../inventory.ini")).mail_name
+    port = regex("(?m)^mail.*port=(?P<mail_port>[^ ]+)", file("${path.root}/../../inventory.ini")).mail_port
+    username = ""
+    password = ""
+    from = var.galaxy_user_email
+  }
+
   profiles = {
     front      = ["web"]
     processing = ["processing"]
     singleton  = ["email", "analysis", "sync", "ncbi"]
   }
+
   replicates = {
     front      = var.front_replicates
     processing = var.processing_replicates
     singleton  = 1 # MUST ALWAYS BE 1
   }
-  irida_config = [
-    "irida.db.profile=${var.debug ? "dev" : "prod"}",
-    "server.base.url='${var.base_url}'",
-    "jdbc.url='jdbc:${local.db_conf.scheme}://${local.db_conf.host}/${local.db_conf.name}'",
-    "jdbc.username='${local.db_conf.user}'",
-    "jdbc.password='${local.db_conf.pass}'", # TODO use k8s secret?
-    var.galaxy_api_key == "" ? "" : "galaxy.execution.apiKey='${var.galaxy_api_key}'",
-    var.galaxy_user_email == "" ? "" : "galaxy.execution.email='${var.galaxy_user_email}'",
-    var.mail_from == "" ? "" : "mail.server.email='${var.mail_from}'",
-    var.mail_user == "" ? "" : "mail.server.username='${var.mail_user}'",
-    var.mail_password == "" ? "" : "mail.server.password='${var.mail_password}'", # TODO use k8s secret?
-    var.ncbi_user == "" ? "" : "ncbi.upload.user='${var.ncbi_user}'",
-    var.ncbi_password == "" ? "" : "ncbi.upload.password='${var.ncbi_password}'",
-    var.help_title == "" ? "" : "help.page.title='${var.help_title}'",
-    var.help_url == "" ? "" : "help.page.url='${var.help_url}'",
-    var.help_email == "" ? "" : "help.contact.email='${var.help_email}'",
-    var.analysis_warning == "" ? "" : "irida.analysis.warning='${var.analysis_warning}'",
-    length(var.hide_workflows) == 0 ? "" : "irida.workflow.types.disabled='${join(",", var.hide_workflows)}'",
-  ]
+
+  irida_config = join("\n", [for k, v in merge(local.ansible.irida.config, {
+    "irida.db.profile"= var.debug ? "dev" : "prod"
+    "server.base.url" = var.base_url
+    "jdbc.url" = "jdbc:${local.db_conf.scheme}://${local.db_conf.host}/${local.db_conf.name}"
+    "jdbc.username"=local.db_conf.user
+    "jdbc.password"=local.db_conf.pass
+    "galaxy.execution.apiKey" = var.galaxy_api_key
+    "galaxy.execution.email" = var.galaxy_user_email
+    "irida.workflow.types.disabled" = join(",", var.hide_workflows)
+  }): "${k}=${v}"])
+
+  web_config = join("\n", [for k, v in merge(local.ansible.irida.web, {
+    "mail.server.host" = local.mail_config.host
+    "mail.server.port" = local.mail_config.port
+    "mail.server.email" = local.mail_config.from
+    "mail.server.username" = local.mail_config.username
+  }, local.mail_config.password == "" ? {} : {"mail.server.password" = local.mail_config.password}, var.web_config): "${k}=${v}"])
 }
 
 resource "random_password" "db_password" {
@@ -142,67 +149,27 @@ variable "galaxy_user_email" {
   description = "The email address of an account to run workflows in Galaxy"
 }
 
-variable "mail_name" {
-  type        = string
-  default     = "mail"
-  description = "SMTP server name"
+variable "mail_config" {
+  type = object({
+    host = string
+    port = number
+    username = string
+    password = string
+    from = string
+  })
+  default = null
 }
 
-variable "mail_port" { # TODO is it actually required to specify the port?
-  type        = number
-  default     = 587
-  description = "Port to connect to SMTP server"
+variable "irida_config" {
+  type = map(string)
+  default = {}
+  description = "settings to override in irida.conf"
 }
 
-variable "mail_from" {
-  type        = string
-  description = "Email address to send notifications as"
-}
-
-variable "mail_user" {
-  type        = string
-  description = "User name for SMTP server"
-}
-
-variable "mail_password" {
-  type        = string
-  description = "Password for SMTP server"
-}
-
-variable "ncbi_user" {
-  type        = string
-  default     = ""
-  description = "FTP username for bulk SRA uploads"
-}
-
-variable "ncbi_password" {
-  type        = string
-  default     = ""
-  description = "FTP password for bulk SRA uploads"
-}
-
-variable "help_title" {
-  type        = string
-  default     = ""
-  description = "The title for an external help resource"
-}
-
-variable "help_url" {
-  type        = string
-  default     = ""
-  description = "The link for an external help resource"
-}
-
-variable "help_email" {
-  type        = string
-  default     = ""
-  description = "The e-mail address for contacting an administrator for help"
-}
-
-variable "analysis_warning" {
-  type        = string
-  default     = ""
-  description = "Display a dismissable warning above all analysis results and metadata pages"
+variable "web_config" {
+  type = map(string)
+  default = {}
+  description = "settings to override in web.conf"
 }
 
 variable "hide_workflows" {

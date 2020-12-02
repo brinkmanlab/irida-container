@@ -8,7 +8,7 @@ resource "docker_container" "irida_singleton" {
   must_run   = true
   #user       = "irida:irida"
   env = [
-    "JAVA_OPTS=-D${join(" -D", compact(local.irida_config))} -Dspring.profiles.active=${join(",", local.profiles.singleton)}",
+    "JAVA_OPTS=-Dspring.profiles.active=${join(",", local.profiles.singleton)}",
   ]
   networks_advanced {
     name = local.network
@@ -22,5 +22,13 @@ resource "docker_container" "irida_singleton" {
   mounts {
     target = local.tmp_dir
     type = "volume"
+  }
+  upload {
+    file = "${local.config_dir}/irida.conf"
+    content = local.irida_config
+  }
+  upload {
+    file = "${local.config_dir}/web.conf"
+    content = local.web_config
   }
 }

@@ -27,6 +27,14 @@ resource "docker_container" "irida_front" {
     target = local.tmp_dir
     type = "volume"
   }
+  upload {
+    file = "${local.config_dir}/irida.conf"
+    content = local.irida_config
+  }
+  upload {
+    file = "${local.config_dir}/web.conf"
+    content = local.web_config
+  }
 }
 
 resource "docker_image" "wait_for_init" {

@@ -1,46 +1,10 @@
 ---
-author: Nolan W. <nolan_w@sfu.ca>
-url: https://github.com/brinkmanlab/
-vendor: Brinkman Lab
-
-containers:
-  app:
-    name: irida-app  # Must be valid hostname (no underscores)
-    image: brinkmanlab/irida-app
-  db:
-    name: irida-db  # Must be valid hostname (no underscores)
-    image: mariadb
-  galaxy:
-    name: galaxy-web  # Must be valid hostname (no underscores)
-
-volumes:
-  user_data:
-    name: user-data
-  db_data:
-    name: db-data
-
-paths:
-  data: /irida
-  sequences: &sequences /irida/sequences
-  reference: &reference /irida/reference
-  output: &output /irida/output
-  assembly: &assembly /irida/assembly
-  tmp: /tmp
-  config: /etc/irida
-
 irida:
-  version: 20.09.3
-  uid: 1000
-  gid: 1000
-  web:
-    mail.server.host: "{{ hostvars['mail'].hostname }}"
-    mail.server.protocol: "{{ hostvars['mail'].protocol }}"
-    mail.server.port: "{{ hostvars['mail'].port }}"
   config:
-    sequence.file.base.directory: *sequences
-    reference.file.base.directory: *reference
-    output.file.base.directory: *output
-    assembly.file.base.directory: *assembly
+    sequence.file.base.directory: "{{ paths.sequences }}"
+    reference.file.base.directory: "{{ paths.reference }}"
+    output.file.base.directory: "{{ paths.output }}"
+    assembly.file.base.directory: "{{ paths.assembly }}"
     file.processing.core.size: 4
     file.processing.max.size: 8
     file.processing.queue.capacity: 512

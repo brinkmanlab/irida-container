@@ -38,7 +38,7 @@ resource "kubernetes_deployment" "irida_processing" {
           name  = "irida-processing"
           env {
             name  = "JAVA_OPTS"
-            value = "-D${join(" -D", compact(local.irida_config))} -Dspring.profiles.active=${join(",", local.profiles.processing)}"
+            value = "-Dspring.profiles.active=${join(",", local.profiles.processing)}"
           }
 
           resources {
@@ -59,6 +59,11 @@ resource "kubernetes_deployment" "irida_processing" {
             mount_path = local.data_dir
             name       = "data"
           }
+          volume_mount {
+            mount_path = local.config_dir
+            name = "config"
+            read_only = true
+          }
         }
         node_selector = {
           WorkClass = "service"
@@ -73,7 +78,12 @@ resource "kubernetes_deployment" "irida_processing" {
             claim_name = var.claim_name
           }
         }
-        # TODO Configure
+        volume {
+          name = "config"
+          secret {
+            secret_name = kubernetes_secret.config.metadata.0.name
+          }
+        }
         # https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#volume-2
       }
     }
