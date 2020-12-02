@@ -17,21 +17,6 @@ module "cloud" {
   debug = var.debug
 }
 
-module "galaxy" {
-  source   = "github.com/brinkmanlab/galaxy-container.git//destinations/aws"
-  instance = var.instance
-  galaxy_conf = {
-    require_login       = true
-    allow_user_creation = false
-  }
-  image_tag   = "dev"
-  admin_users = [var.email]
-  email       = var.email
-  debug       = var.debug
-  eks         = module.cloud.eks
-  vpc         = module.cloud.vpc
-}
-
 data "aws_eks_cluster" "cluster" {
   name = module.cloud.eks.cluster_id
 }
@@ -45,6 +30,50 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.cluster.token
   load_config_file       = false
+}
+
+resource "kubernetes_namespace" "instance" {
+  metadata {
+    name = var.instance
+  }
+}
+
+module "galaxy-storage" {
+  #source = "github.com/brinkmanlab/galaxy-container.git//destinations/aws/storage"
+  source = "../../../galaxy-container/destinations/aws/storage"
+  instance = var.instance
+  user_data_volume_name = "user-data-${var.instance}"
+  vpc = module.cloud.vpc
+}
+
+module "irida-storage" {
+  source = "../../destinations/aws/storage"
+  namespace = kubernetes_namespace.instance
+  nfs_server = module.galaxy-storage.nfs_server
+  app_name = "irida-app"
+  data_dir = "/irida"
+  image_tag = "dev"
+  instance = var.instance
+  irida_image = "brinkmanlab/irida-app"
+  user_data_volume_name = "user-data-${var.instance}"
+}
+
+module "galaxy" {
+  source   = "github.com/brinkmanlab/galaxy-container.git//destinations/aws"
+  instance = var.instance
+  galaxy_conf = {
+    require_login       = true
+    allow_user_creation = false
+  }
+  image_tag   = "dev"
+  admin_users = [var.email]
+  email       = var.email
+  debug       = var.debug
+  eks         = module.cloud.eks
+  vpc         = module.cloud.vpc
+  nfs_server = module.galaxy-storage.nfs_server
+  extra_job_mounts = module.irida-storage.extra_job_mounts
+  extra_mounts = module.irida-storage.extra_mounts
 }
 
 module "admin_user" {
@@ -71,7 +100,7 @@ module "irida" {
   mail_user              = module.galaxy.smtp_conf["smtp_username"]
   mail_password          = module.galaxy.smtp_conf["smtp_password"]
   base_url               = var.base_url #!= "" ? var.base_url : module.galaxy.endpoint
-  nfs_server             = module.galaxy.efs_user_data
+  claim_name             = module.irida-storage.claim_name
   vpc_security_group_ids = [module.cloud.eks.worker_security_group_id]
   db_subnet_group_name   = module.cloud.vpc.database_subnet_group
   #ncbi_user = ""

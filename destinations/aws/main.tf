@@ -28,7 +28,7 @@ module "k8s" {
   tmp_dir               = local.tmp_dir
   user_data_volume_name = local.user_data_volume_name
   db_data_volume_name   = local.db_data_volume_name
-  nfs_server            = var.nfs_server
+  claim_name            = var.claim_name
   analysis_warning      = var.analysis_warning
   help_email            = var.help_email
   help_title            = var.help_title

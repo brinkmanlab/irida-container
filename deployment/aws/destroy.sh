@@ -4,4 +4,7 @@
 terraform destroy -target=module.irida -auto-approve
 terraform destroy -target=module.admin_user -auto-approve
 terraform destroy -target=module.galaxy -auto-approve
+terraform destroy -target=module.irida-storage -auto-approve
+terraform destroy -target=module.galaxy-storage -auto-approve
+terraform destroy -target=module.cloud -auto-approve
 terraform destroy -auto-approve

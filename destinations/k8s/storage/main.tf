@@ -10,10 +10,13 @@ resource "kubernetes_job" "init_nfs" {
       spec {
         container {
           name  = "init-nfs-irida"
-          image = "${local.irida_image}:${var.image_tag}"
+          image = "${var.irida_image}:${var.image_tag}"
+          security_context {
+            run_as_user = 0
+          }
           command = [
             "sh", "-c",
-            "install -d -m 0777 -o 1000 -g 1000 /mnt/${local.instance}/${local.app_name}/ && cp -r ${local.data_dir}/* /mnt/${local.instance}/${local.app_name}/"
+            "install -d -m 0777 -o 1000 -g 1000 /mnt/${var.instance}/${var.app_name}/ && cp -avr ${var.data_dir}/* /mnt/${var.instance}/${var.app_name}/"
           ]
           volume_mount {
             mount_path = "/mnt"
@@ -44,10 +47,10 @@ resource "kubernetes_job" "init_nfs" {
 resource "kubernetes_persistent_volume" "user_data" {
   depends_on = [kubernetes_job.init_nfs]
   metadata {
-    name = "${local.app_name}-${local.user_data_volume_name}"
+    name = "${var.app_name}-${var.user_data_volume_name}"
     labels = {
-      "app.kubernetes.io/name"     = local.app_name
-      "app.kubernetes.io/instance" = local.app_name
+      "app.kubernetes.io/name"     = var.app_name
+      "app.kubernetes.io/instance" = var.app_name
       #"app.kubernetes.io/version" = TODO
       "app.kubernetes.io/component"  = "pv"
       "app.kubernetes.io/part-of"    = "irida"
@@ -63,7 +66,7 @@ resource "kubernetes_persistent_volume" "user_data" {
     storage_class_name               = "filestore"
     persistent_volume_source {
       nfs {
-        path      = "/${local.instance}/${local.app_name}/"
+        path      = "/${var.instance}/${var.app_name}/"
         server    = var.nfs_server
         read_only = false
       }
@@ -74,11 +77,11 @@ resource "kubernetes_persistent_volume" "user_data" {
 
 resource "kubernetes_persistent_volume_claim" "user_data" {
   metadata {
-    name      = "${local.app_name}-${local.user_data_volume_name}"
-    namespace = local.instance
+    name      = "${var.app_name}-${var.user_data_volume_name}"
+    namespace = var.instance
     labels = {
-      "app.kubernetes.io/name"     = local.app_name
-      "app.kubernetes.io/instance" = local.app_name
+      "app.kubernetes.io/name"     = var.app_name
+      "app.kubernetes.io/instance" = var.app_name
       #"app.kubernetes.io/version" = TODO
       "app.kubernetes.io/component"  = "pvc"
       "app.kubernetes.io/part-of"    = "irida"

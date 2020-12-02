@@ -3,9 +3,9 @@ locals {
   instance = var.instance == "" ? "default" : var.instance
 }
 
-variable "nfs_server" {
+variable "claim_name" {
   type        = string
-  description = "URL to NFS server containing user data"
+  description = "Name of user data PVC"
 }
 
 variable "vpc_security_group_ids" {

@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "irida_processing" {
         volume {
           name = "data"
           persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.user_data.metadata.0.name
+            claim_name = var.claim_name
           }
         }
         # TODO Configure
