@@ -21,6 +21,7 @@ resource "aws_db_instance" "irida_db" {
 
 ## Register database in internal DNS
 resource "kubernetes_service" "irida_db" {
+  depends_on = [aws_db_instance.irida_db]
   metadata {
     name      = local.db_conf.host
     namespace = local.namespace.metadata.0.name
