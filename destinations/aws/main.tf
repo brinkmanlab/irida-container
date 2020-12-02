@@ -11,6 +11,7 @@ resource "kubernetes_namespace" "instance" {
 
 module "k8s" {
   source                = "../k8s"
+  depends_on = [kubernetes_service.irida_db]
   irida_image           = var.irida_image
   image_tag             = var.image_tag
   db_conf               = local.db_conf
