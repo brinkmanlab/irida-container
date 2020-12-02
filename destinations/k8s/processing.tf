@@ -34,7 +34,7 @@ resource "kubernetes_deployment" "irida_processing" {
       }
       spec {
         container {
-          image = "${var.irida_image}:${var.image_tag}"
+          image = "${local.irida_image}:${var.image_tag}"
           name  = "irida-processing"
           env {
             name  = "JAVA_OPTS"

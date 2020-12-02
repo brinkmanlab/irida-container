@@ -33,7 +33,7 @@ resource "kubernetes_deployment" "irida_front" {
       }
       spec {
         container {
-          image = "${var.irida_image}:${var.image_tag}"
+          image = "${local.irida_image}:${var.image_tag}"
           name  = "irida-front"
           env {
             name  = "JAVA_OPTS"
