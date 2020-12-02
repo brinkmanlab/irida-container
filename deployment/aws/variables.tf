@@ -4,6 +4,7 @@ variable "instance" {
 
 variable "debug" {
   type = bool
+  default = false
 }
 
 variable "email" {

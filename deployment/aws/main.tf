@@ -64,6 +64,7 @@ module "galaxy" {
   galaxy_conf = {
     require_login       = true
     allow_user_creation = false
+    email_from = var.email
   }
   image_tag   = "dev"
   admin_users = [var.email]
@@ -93,6 +94,7 @@ module "irida" {
   source                 = "../../destinations/aws"
   depends_on             = [module.cloud.eks]
   instance               = var.instance
+  namespace              = kubernetes_namespace.instance
   image_tag              = "dev"
   galaxy_api_key         = module.admin_user.api_key
   galaxy_user_email      = var.email

@@ -25,7 +25,7 @@ locals {
   db_conf = var.db_conf != null ? var.db_conf : {
     scheme = "mysql"
     host   = local.db_name
-    name   = var.instance == "" ? "irida" : "irida_${var.instance}"
+    name   = "irida"
     user   = "irida"
     pass   = random_password.db_password[0].result
   }
