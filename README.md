@@ -12,7 +12,7 @@ IRIDAs default username and password is `admin` and `password1` respectively.
 ## Run local
 Change the current working directory to `./deployment/docker`. Modify `./changeme.auto.tfvars` with any custom values you like.
 You must at least set the `docker_gid` variable to a group id with write access to `/var/run/docker.sock`.
-Run `ls -n /var/run/docker.sock` to show the owning group id.
+Run `stat /var/run/docker.sock` (or `stat -x /var/run/docker.sock` on OSX) to show the owning group id.
 
 Run the following to start an instance on your local computer using docker:
 ```shell script
@@ -53,6 +53,7 @@ Visit [here](http://localhost:8001/api/v1/namespaces/kube-system/services/https:
 access the dashboard.
 
 To check the state of the cluster run `kubectl describe node`.
+To restart a deployment run `kubectl rollout restart -n irida deployment <deployment name>`.
 
 ### Existing Kubernetes cluster
 
