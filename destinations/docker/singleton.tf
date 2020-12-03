@@ -8,7 +8,7 @@ resource "docker_container" "irida_singleton" {
   must_run   = true
   #user       = "irida:irida"
   env = [
-    "JAVA_OPTS=-Dspring.profiles.active=${join(",", local.profiles.singleton)}",
+    "JAVA_OPTS=-Dirida.db.profile=${var.debug ? "dev" : "prod"} -Dspring.profiles.active=${join(",", local.profiles.singleton)}",
   ]
   networks_advanced {
     name = local.network

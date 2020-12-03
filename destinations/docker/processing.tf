@@ -8,7 +8,7 @@ resource "docker_container" "irida_processing" {
   must_run   = true
   #user       = "irida:irida"
   env = [
-    "JAVA_OPTS=-Dspring.profiles.active=${join(",", local.profiles.processing)}",
+    "JAVA_OPTS=-Dirida.db.profile=${var.debug ? "dev" : "prod"} -Dspring.profiles.active=${join(",", local.profiles.processing)}",
   ]
   networks_advanced {
     name = local.network

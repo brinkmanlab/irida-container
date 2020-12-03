@@ -49,7 +49,6 @@ locals {
   }
 
   irida_config = join("\n", [for k, v in merge(local.ansible.irida.config, {
-    "irida.db.profile"= var.debug ? "dev" : "prod"
     "server.base.url" = var.base_url
     "jdbc.url" = "jdbc:${local.db_conf.scheme}://${local.db_conf.host}/${local.db_conf.name}"
     "jdbc.username"=local.db_conf.user
@@ -57,6 +56,7 @@ locals {
     "galaxy.execution.apiKey" = var.galaxy_api_key
     "galaxy.execution.email" = var.galaxy_user_email
     "irida.workflow.types.disabled" = join(",", var.hide_workflows)
+    "galaxy.execution.url" = "http://${local.galaxy_name}/"
   }): "${k}=${v}"])
 
   web_config = join("\n", [for k, v in merge(local.ansible.irida.web, {
@@ -64,6 +64,7 @@ locals {
     "mail.server.port" = local.mail_config.port
     "mail.server.email" = local.mail_config.from
     "mail.server.username" = local.mail_config.username
+    "mail.server.protocol" = "smtp"
   }, local.mail_config.password == "" ? {} : {"mail.server.password" = local.mail_config.password}, var.web_config): "${k}=${v}"])
 }
 

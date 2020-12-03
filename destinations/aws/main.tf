@@ -19,9 +19,9 @@ module "k8s" {
   base_url              = local.base_url
   galaxy_api_key        = var.galaxy_api_key
   galaxy_user_email     = var.galaxy_user_email
-  mail_config           = local.mail_config
-  irida_config          = local.irida_config
-  web_config            = local.web_config
+  mail_config           = var.mail_config
+  irida_config          = var.irida_config
+  web_config            = var.web_config
   app_name              = local.app_name
   db_name               = local.db_name
   data_dir              = local.data_dir

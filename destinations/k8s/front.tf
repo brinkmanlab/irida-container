@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "irida_front" {
           name  = "irida-front"
           env {
             name  = "JAVA_OPTS"
-            value = "-Dspring.profiles.active=${join(",", local.profiles.front)}"
+            value = "-Dirida.db.profile=${var.debug ? "dev" : "prod"} -Dspring.profiles.active=${join(",", local.profiles.front)}"
           }
 
           readiness_probe {

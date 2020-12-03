@@ -38,7 +38,7 @@ resource "kubernetes_deployment" "irida_processing" {
           name  = "irida-processing"
           env {
             name  = "JAVA_OPTS"
-            value = "-Dspring.profiles.active=${join(",", local.profiles.processing)}"
+            value = "-Dirida.db.profile=${var.debug ? "dev" : "prod"} -Dspring.profiles.active=${join(",", local.profiles.processing)}"
           }
 
           resources {

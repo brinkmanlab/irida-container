@@ -38,7 +38,7 @@ resource "kubernetes_deployment" "irida_singleton" {
           name  = "irida-singleton"
           env {
             name  = "JAVA_OPTS"
-            value = "-Dspring.profiles.active=${join(",", local.profiles.singleton)}"
+            value = "-Dirida.db.profile=${var.debug ? "dev" : "prod"} -Dspring.profiles.active=${join(",", local.profiles.singleton)}"
           }
 
           resources {

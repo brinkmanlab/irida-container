@@ -8,7 +8,7 @@ resource "docker_container" "irida_front" {
   must_run   = true
   #user       = "irida:irida"
   env = [
-    "JAVA_OPTS=-D${join(" -D", compact(local.irida_config))} -Dspring.profiles.active=${join(",", local.profiles.front)}",
+    "JAVA_OPTS=-Dirida.db.profile=${var.debug ? "dev" : "prod"} -Dspring.profiles.active=${join(",", local.profiles.front)}",
   ]
   ports {
     external = var.host_port
