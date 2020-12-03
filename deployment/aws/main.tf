@@ -39,8 +39,7 @@ resource "kubernetes_namespace" "instance" {
 }
 
 module "galaxy-storage" {
-  #source = "github.com/brinkmanlab/galaxy-container.git//destinations/aws/storage"
-  source = "../../../galaxy-container/destinations/aws/storage"
+  source = "github.com/brinkmanlab/galaxy-container.git//destinations/aws/storage"
   instance = var.instance
   user_data_volume_name = "user-data-${var.instance}"
   vpc = module.cloud.vpc
