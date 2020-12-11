@@ -75,9 +75,7 @@ module "galaxy" {
   nfs_server = module.galaxy-storage.nfs_server
   extra_job_mounts = module.irida-storage.extra_job_mounts
   extra_mounts = module.irida-storage.extra_mounts
-  tool_mappings = {
-    shovill = "c1m2"
-  }
+  tool_mappings = yamldecode(file("../../tool_mapping.yml"))
 }
 
 provider "galaxy" {

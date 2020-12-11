@@ -1,0 +1,11 @@
+# destinations: tiny, c1m1, c1m2, c1m4, c1m8, c2m2, c2m4, c4m8, c8m16, c16m32
+shovill: c8m16
+sistr_cmd: c8m16
+flash: c8m16
+regexColumn1: c8m16
+regex1: c8m16
+filter_spades_repeat: c8m16
+assemblystats: c8m16
+prokka: c8m16
+mentalist: c16m32
+spades: c16m32
