@@ -10,6 +10,7 @@ To install terraform, check that your systems package manager provides it or dow
 IRIDAs default username and password is `admin` and `password1` respectively.
 
 ## Run local
+Ensure docker can be [run without root privileges](https://docs.docker.com/engine/install/linux-postinstall/).
 Change the current working directory to `./deployment/docker`. Modify `./changeme.auto.tfvars` with any custom values you like.
 You must at least set the `docker_gid` variable to a group id with write access to `/var/run/docker.sock`.
 Run `stat /var/run/docker.sock` (or `stat -x /var/run/docker.sock` on OSX) to show the owning group id.
