@@ -34,13 +34,12 @@ resource "docker_container" "irida_db" {
 resource "docker_container" "wait_for_db" {
   depends_on = [docker_container.irida_db]
   image = docker_image.irida_db.latest
-  name = "wait_for_db"
+  name = "wait_for_irida_db"
   must_run = false
   attach = true
   user = "mysql"
   command = ["bash", "-c", "until mysql -e '\\q' -h '${local.db_conf.host}' -u '${local.db_conf.user}' --password='${local.db_conf.pass}'; do sleep 1; done"]
   networks_advanced {
     name = local.network
-    aliases = [local.db_name]
   }
 }
