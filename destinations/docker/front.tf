@@ -44,7 +44,7 @@ resource "docker_image" "wait_for_init" {
 resource "docker_container" "wait_for_init" {
   depends_on = [docker_container.irida_front]
   image = docker_image.wait_for_init.latest
-  name = "wait_for_init"
+  name = "wait_for_irida_init"
   must_run = false
   attach = true
   command = ["bash", "-c", "until curl -sS --fail -o /dev/null 'http://irida-app-front:8080/'; do sleep 1; done"]
