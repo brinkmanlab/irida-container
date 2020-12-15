@@ -13,7 +13,6 @@ module "galaxy" {
   admin_users = [var.email]
   email       = var.email
   debug       = var.debug
-  host_port = var.host_port
   extra_mounts = [
     {
       source = docker_volume.user_data.name
