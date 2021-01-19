@@ -30,18 +30,22 @@ To shut down this instance, run `./destroy.sh`. This will delete the instance, a
 
 Several terraform destinations have been configured. Select one from the `./deployment/` folder that you wish to use.
 Modify `./changeme.auto.tfvars` with any custom values you like. Ensure you are authenticated with your cloud provider
-and that the required environment variables are set for the respective terraform provider.
+and that the required environment variables are set for the respective terraform provider. Review the relevant cloud provider section below
+for additional configuration. Once fully prepared, run `./deploy.sh` to deploy the application to the cloud.
 
 ### AWS
 
+Select the region to deploy to by exporting `export AWS_DEFAULT_REGION='us-west-2'` or creating an aws provider configuration block in the terraform definitions.
+See the [supported regions for EKS](https://docs.aws.amazon.com/general/latest/gr/eks.html) as not all regions support deployment. This step is independent of the default region setting in the next step.
+
 Install the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) and [aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html).
-Ensure you are authenticating with the correct IAM user by running `aws sts get-caller-identity`. Run `aws configure` to specify the
-credentials to use for deployment. The user deploying the cluster will automatically be granted admin privileges for the cluster.
+Run `aws configure` to specify the credentials to use for deployment. Ensure you are authenticating with the correct IAM user by running `aws sts get-caller-identity`. 
+The user deploying the cluster will automatically be granted admin privileges for the cluster. Proceed with deployment.
 
 IRIDA is deployed into a AWS EKS cluster. Run `aws-iam-authenticator token -i irida --token-only` to get the required token for the dashboard.
 
+Additionally:
 Configure `kubectl` by running `aws eks --region us-west-2 update-kubeconfig --name irida`.
-
 Refer to the Kubernetes section for the remaining information.
 
 ### Azure
