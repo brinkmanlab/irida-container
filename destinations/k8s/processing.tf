@@ -33,6 +33,7 @@ resource "kubernetes_deployment" "irida_processing" {
         }
       }
       spec {
+        automount_service_account_token = false
         container {
           image = "${local.irida_image}:${var.image_tag}"
           name  = "irida-processing"

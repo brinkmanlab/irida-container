@@ -33,6 +33,7 @@ resource "kubernetes_deployment" "irida_singleton" {
         }
       }
       spec {
+        automount_service_account_token = false
         container {
           image = "${local.irida_image}:${var.image_tag}"
           name  = "irida-singleton"
