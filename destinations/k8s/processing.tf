@@ -42,11 +42,11 @@ resource "kubernetes_deployment" "irida_processing" {
           }
 
           resources {
-            limits {
+            limits = {
               cpu    = "2"
               memory = "2Gi"
             }
-            requests {
+            requests = {
               cpu    = "1"
               memory = "1Gi"
             }
