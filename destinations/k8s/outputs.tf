@@ -1,5 +1,5 @@
 output "endpoint" {
-  value = kubernetes_service.irida.load_balancer_ingress.0.hostname
+  value = kubernetes_service.irida.status.0.load_balancer.0.ingress.0.hostname
 }
 
 output "namespace" {
