@@ -5,3 +5,4 @@ kubeconfig*
 /api_key.json
 .idea
 /terraform
+/deployment/aws/tool-list.yml
