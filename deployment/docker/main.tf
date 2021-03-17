@@ -23,6 +23,7 @@ module "galaxy" {
   ]
   extra_job_mounts = ["${docker_volume.user_data.name}:/irida:ro"]
   docker_gid = var.docker_gid
+  docker_socket_path = var.docker_socket_path
   tool_mappings = yamldecode(file("../../tool_mapping.yml"))
 }
 
