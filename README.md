@@ -25,7 +25,8 @@ terraform init
 Browse to http://localhost:8081/ to access the deployment. If you want to access Galaxy directly, it is assigned a random port.
 Run `docker ps` to list the running containers, you should see the galaxy-web container with a port exported on 0.0.0.0.
 
-To shut down this instance, run `./destroy.sh`. This will delete the instance, all of its data, and the container images.
+To shut down this instance, run `./destroy.sh`. This will delete the instance, all of its data, and the container images. Docker may fail to unmount
+CVMFS during shutdown, run `sudo fusermount -u ./microbedb/mount` if you encounter `transport endpoint is not connected` errors.
 
 ### OSX Peculiarities
 
