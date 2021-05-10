@@ -5,7 +5,7 @@ provider "aws" {
 module "cloud" {
   source             = "github.com/brinkmanlab/cloud_recipes.git//aws" #?ref=v0.1.2"
   cluster_name       = var.instance
-  autoscaler_version = "1.17.3"
+  autoscaler_version = "1.20.0"
   #docker_registry_proxies = {
   #  quay = {
   #    hostname = "quay.io"
