@@ -92,7 +92,6 @@ module "admin_user" {
 
 module "irida" {
   source                 = "../../destinations/aws"
-  depends_on             = [module.cloud.eks]
   instance               = var.instance
   namespace              = kubernetes_namespace.instance
   image_tag              = "dev"
