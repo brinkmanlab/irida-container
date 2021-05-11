@@ -1,3 +1,3 @@
 [submodule "irida"]
 	path = irida
-	url = git@github.com:phac-nml/irida.git
+	url = https://github.com/phac-nml/irida.git
