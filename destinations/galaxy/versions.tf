@@ -7,7 +7,7 @@ terraform {
       source = "hashicorp/random"
     }
     docker = {
-      source = "terraform-providers/docker"
+      source = "kreuzwerker/docker"
     }
     galaxy = {
       source = "brinkmanlab/galaxy"
