@@ -1,14 +1,18 @@
 locals {
-  repos = yamldecode(data.local_file.tool_list.content)["tools"]
+  tool_list_path = "${abspath(path.root)}/tool-list.yml"
+  tool_list_exist = fileexists(local.tool_list_path)
+  repos = yamldecode(local.tool_list_exist ? file(local.tool_list_path) : data.local_file.tool_list[0].content)["tools"]
   duplicates = ["toolshed.g2.bx.psu.edu/repos/nml/bundle_collections/705ebd286b57"]
 }
 
 resource "docker_image" "irida" {
+  count = local.tool_list_exist ? 0 : 1
   name = "${local.irida_image}:${var.image_tag}"
 }
 
 resource "docker_container" "tool_list" {
-  image = docker_image.irida.latest
+  count = local.tool_list_exist ? 0 : 1
+  image = docker_image.irida[0].latest
   name = "irida-get-tool-list${local.name_suffix}"
   restart = "no"
   must_run = false
@@ -22,8 +26,9 @@ resource "docker_container" "tool_list" {
 }
 
 data "local_file" "tool_list" {
-  depends_on = [docker_container.tool_list]
-  filename = "${abspath(path.root)}/tool-list.yml"
+  count = local.tool_list_exist ? 0 : 1
+  depends_on = [docker_container.tool_list[0]]
+  filename = local.tool_list_path
 }
 
 resource "galaxy_repository" "repositories" {
