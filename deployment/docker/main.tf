@@ -9,7 +9,7 @@ module "galaxy" {
     require_login       = true
     allow_user_creation = false
   }
-  image_tag   = "dev"
+  image_tag   = "latest"
   admin_users = [var.email]
   email       = var.email
   debug       = var.debug
@@ -44,7 +44,7 @@ module "irida" {
   source                 = "../../destinations/docker"
   depends_on             = [module.galaxy]
   instance               = var.instance
-  image_tag              = "dev"
+  image_tag              = "latest"
   galaxy_api_key         = module.admin_user.api_key
   galaxy_user_email      = var.email
   base_url               = var.base_url #!= "" ? var.base_url : module.galaxy.endpoint

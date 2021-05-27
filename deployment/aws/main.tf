@@ -65,7 +65,7 @@ module "galaxy" {
     allow_user_creation = false
     email_from = var.email
   }
-  image_tag   = "dev"
+  image_tag   = "latest"
   admin_users = [var.email]
   email       = var.email
   debug       = var.debug
@@ -94,7 +94,7 @@ module "irida" {
   source                 = "../../destinations/aws"
   instance               = var.instance
   namespace              = kubernetes_namespace.instance
-  image_tag              = "dev"
+  image_tag              = "latest"
   galaxy_api_key         = module.admin_user.api_key
   galaxy_user_email      = var.email
   mail_config = {
