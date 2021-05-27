@@ -29,7 +29,6 @@ paths:
   config: /etc/irida
 
 irida:
-  version: 21.01.3
   uid: 1000
   gid: 1000
   web:

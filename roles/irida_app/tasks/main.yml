@@ -41,9 +41,19 @@
     dest: "{{ paths.config }}/web_conf.yml"
     mode: u=rw,g=r,o=r
 
+- name: Read irida version
+  xml:
+    path: "{{ playbook_dir }}/irida/pom.xml"
+    xpath: "/x:project/x:version"
+    content: text
+    namespaces:
+      x: "http://maven.apache.org/POM/4.0.0"
+  register: irida_version
+  delegate_to: buildah_server
+
 - name: Import irida.war
   copy:
-    src: "{{ playbook_dir }}/irida/target/irida-{{ irida.version }}.war"
+    src: "{{ playbook_dir }}/irida/target/irida-{{ (irida_version.matches[0].values() | list)[0] }}.war"
     dest: "/usr/local/tomcat/webapps/ROOT.war"
     mode: u=rw,g=r,o=r
 
