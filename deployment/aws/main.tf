@@ -111,4 +111,6 @@ module "irida" {
   #ncbi_user = ""
   #ncbi_password = ""
   debug = var.debug
+  #plugins = []
+  #additional_repos = []
 }

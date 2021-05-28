@@ -55,4 +55,6 @@ module "irida" {
   network = module.galaxy.network
   db_image = "mariadb:10.5.4"
   user_data_volume = docker_volume.user_data
+  #plugins = []
+  #additional_repos = []
 }

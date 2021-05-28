@@ -34,4 +34,6 @@ module "galaxy" {
   front_replicates      = var.front_replicates
   processing_replicates = var.processing_replicates
   debug                 = var.debug
+  plugins               = var.plugins
+  additional_repos      = var.additional_repos
 }

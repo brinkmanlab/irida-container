@@ -1,8 +1,7 @@
 locals {
   tool_list_path = "${abspath(path.root)}/tool-list.yml"
   tool_list_exist = fileexists(local.tool_list_path)
-  repos = yamldecode(local.tool_list_exist ? file(local.tool_list_path) : data.local_file.tool_list[0].content)["tools"]
-  duplicates = ["toolshed.g2.bx.psu.edu/repos/nml/bundle_collections/705ebd286b57"]
+  repos = concat(yamldecode(local.tool_list_exist ? file(local.tool_list_path) : data.local_file.tool_list[0].content)["tools"], var.additional_repos)
 }
 
 resource "docker_image" "irida" {
@@ -32,9 +31,10 @@ data "local_file" "tool_list" {
 }
 
 resource "galaxy_repository" "repositories" {
-  for_each = { for k, v in zipmap([for repo in local.repos: "${regex("(?:https?://)?([^/]+)", repo.tool_shed_url)[0]}/repos/${repo.owner}/${repo.name}/${repo.revisions[0]}"], local.repos): k => v if !contains(local.duplicates, k) }
-  tool_shed = regex("(?:https?://)?([^/]+)", each.value.tool_shed_url)[0]
-  owner = each.value.owner
-  name = each.value.name
-  changeset_revision = each.value.revisions[0]
+  # Deduplicate repos using https://www.terraform.io/docs/language/expressions/for.html#grouping-results
+  for_each = { for k, v in zipmap([for repo in local.repos: "${regex("(?:https?://)?([^/]+)", repo.tool_shed_url)[0]}/repos/${repo.owner}/${repo.name}/${repo.revisions[0]}"], local.repos): k => v... }
+  tool_shed = regex("(?:https?://)?([^/]+)", each.value.0.tool_shed_url)[0]
+  owner = each.value.0.owner
+  name = each.value.0.name
+  changeset_revision = each.value.0.revisions[0]
 }

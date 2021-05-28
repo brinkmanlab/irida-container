@@ -1,8 +1,8 @@
 locals {
-  ansible        = yamldecode(file("${path.module}/../../vars.yml"))
+  ansible = yamldecode(file("${path.module}/../../vars.yml"))
 
   app_name              = var.app_name != null ? var.app_name : local.ansible.containers.app.name
-  db_name               = var.db_name  != null ? var.db_name  : local.ansible.containers.db.name
+  db_name               = var.db_name != null ? var.db_name : local.ansible.containers.db.name
   data_dir              = var.data_dir != null ? var.data_dir : local.ansible.paths.data
   galaxy_name           = local.ansible.containers.galaxy.name
   reference_dir         = local.ansible.paths.reference
@@ -12,11 +12,11 @@ locals {
   config_dir            = local.ansible.paths.config
   tmp_dir               = local.ansible.paths.tmp
   user_data_volume_name = var.user_data_volume_name != null ? var.user_data_volume_name : local.ansible.volumes.user_data.name
-  db_data_volume_name   = var.db_data_volume_name   != null ? var.db_data_volume_name   : local.ansible.volumes.db_data.name
+  db_data_volume_name   = var.db_data_volume_name != null ? var.db_data_volume_name : local.ansible.volumes.db_data.name
 
   irida_image = var.irida_image != null ? var.irida_image : "brinkmanlab/${local.app_name}"
-  irida_uid             = local.ansible.irida.uid
-  irida_gid             = local.ansible.irida.gid
+  irida_uid   = local.ansible.irida.uid
+  irida_gid   = local.ansible.irida.gid
 
   name_suffix = var.instance == "" ? "" : "-${var.instance}"
 
@@ -29,11 +29,11 @@ locals {
   }
 
   mail_config = var.mail_config != null ? var.mail_config : {
-    host = regex("(?m)^mail.*hostname=(?P<mail_name>[^ ]+)", file("${path.module}/../../inventory.ini")).mail_name
-    port = regex("(?m)^mail.*port=(?P<mail_port>[^ ]+)", file("${path.root}/../../inventory.ini")).mail_port
+    host     = regex("(?m)^mail.*hostname=(?P<mail_name>[^ ]+)", file("${path.module}/../../inventory.ini")).mail_name
+    port     = regex("(?m)^mail.*port=(?P<mail_port>[^ ]+)", file("${path.root}/../../inventory.ini")).mail_port
     username = ""
     password = ""
-    from = var.galaxy_user_email
+    from     = var.galaxy_user_email
   }
 
   profiles = {
@@ -49,23 +49,26 @@ locals {
   }
 
   irida_config = join("\n", [for k, v in merge(local.ansible.irida.config, {
-    "server.base.url" = var.base_url
-    "jdbc.url" = "jdbc:${local.db_conf.scheme}://${local.db_conf.host}/${local.db_conf.name}"
-    "jdbc.username"=local.db_conf.user
-    "jdbc.password"=local.db_conf.pass
-    "galaxy.execution.apiKey" = var.galaxy_api_key
-    "galaxy.execution.email" = var.galaxy_user_email
+    "server.base.url"               = var.base_url
+    "jdbc.url"                      = "jdbc:${local.db_conf.scheme}://${local.db_conf.host}/${local.db_conf.name}"
+    "jdbc.username"                 = local.db_conf.user
+    "jdbc.password"                 = local.db_conf.pass
+    "galaxy.execution.apiKey"       = var.galaxy_api_key
+    "galaxy.execution.email"        = var.galaxy_user_email
     "irida.workflow.types.disabled" = join(",", var.hide_workflows)
-    "galaxy.execution.url" = "http://${local.galaxy_name}/"
-  }): "${k}=${v}"])
+    "galaxy.execution.url"          = "http://${local.galaxy_name}/"
+    "pipeline.plugin.path"          = "${local.data_dir}/plugins"
+  }, var.irida_config) : "${k}=${v}"])
 
   web_config = join("\n", [for k, v in merge(local.ansible.irida.web, {
-    "mail.server.host" = local.mail_config.host
-    "mail.server.port" = local.mail_config.port
-    "mail.server.email" = local.mail_config.from
+    "mail.server.host"     = local.mail_config.host
+    "mail.server.port"     = local.mail_config.port
+    "mail.server.email"    = local.mail_config.from
     "mail.server.username" = local.mail_config.username
     "mail.server.protocol" = "smtp"
-  }, local.mail_config.password == "" ? {} : {"mail.server.password" = local.mail_config.password}, var.web_config): "${k}=${v}"])
+  }, local.mail_config.password == "" ? {} : { "mail.server.password" = local.mail_config.password }, var.web_config) : "${k}=${v}"])
+
+  plugin_curl_cmd = join(" && ", flatten(["cd ${local.data_dir}/plugins", [for url in var.plugins : "curl -O -L '${url}'"]]))
 }
 
 resource "random_password" "db_password" {
@@ -152,24 +155,24 @@ variable "galaxy_user_email" {
 
 variable "mail_config" {
   type = object({
-    host = string
-    port = number
+    host     = string
+    port     = number
     username = string
     password = string
-    from = string
+    from     = string
   })
   default = null
 }
 
 variable "irida_config" {
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
   description = "settings to override in irida.conf"
 }
 
 variable "web_config" {
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
   description = "settings to override in web.conf"
 }
 
@@ -207,4 +210,21 @@ variable "debug" {
   type        = bool
   default     = false
   description = "Enabling will put the deployment into a mode suitable for debugging"
+}
+
+variable "plugins" {
+  type        = set(string)
+  default     = []
+  description = "Set of URLs to wars to download into plugins folder"
+}
+
+variable "additional_repos" {
+  type = list(object({
+    name          = string
+    owner         = string
+    tool_shed_url = string
+    revisions     = list(string)
+  }))
+  default     = []
+  description = "Additional repositories to install to Galaxy"
 }

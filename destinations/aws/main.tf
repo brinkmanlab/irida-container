@@ -34,4 +34,6 @@ module "k8s" {
   processing_replicates = var.processing_replicates
   debug                 = var.debug
   namespace             = local.namespace
+  plugins               = var.plugins
+  additional_repos      = var.additional_repos
 }

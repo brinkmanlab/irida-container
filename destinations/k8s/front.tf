@@ -1,4 +1,5 @@
 resource "kubernetes_deployment" "irida_front" {
+  depends_on = [kubernetes_job.plugins]
   wait_for_rollout = true
   metadata {
     name      = "${local.app_name}-front"
