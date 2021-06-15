@@ -72,6 +72,8 @@ Refer to the Kubernetes section for the remaining information.
 
 ### Azure
 
+TODO
+
 ### Kubernetes
 
 All cloud deployments include a dashboard server that provides administrative control of the cluster.
