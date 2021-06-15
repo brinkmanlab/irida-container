@@ -6,3 +6,4 @@ kubeconfig*
 .idea
 /terraform
 /deployment/aws/tool-list.yml
+/deployment/docker/tool-list.yml
