@@ -10,12 +10,11 @@ resource "kubernetes_namespace" "instance" {
   }
 }
 
-resource "kubernetes_secret" "config" {
+resource "kubernetes_config_map" "config" {
   metadata {
     generate_name = "irida-config-"
     namespace = local.namespace.metadata.0.name
   }
-  type = "Opaque"
   data = {
     "irida.conf" = local.irida_config
     "web.conf" = local.web_config

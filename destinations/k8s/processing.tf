@@ -81,8 +81,8 @@ resource "kubernetes_deployment" "irida_processing" {
         }
         volume {
           name = "config"
-          secret {
-            secret_name = kubernetes_secret.config.metadata.0.name
+          config_map {
+            secret_name = kubernetes_config_map.config.metadata.0.name
           }
         }
         # https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#volume-2
