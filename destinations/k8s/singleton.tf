@@ -82,7 +82,7 @@ resource "kubernetes_deployment" "irida_singleton" {
         volume {
           name = "config"
           config_map {
-            secret_name = kubernetes_config_map.config.metadata.0.name
+            name = kubernetes_config_map.config.metadata.0.name
           }
         }
         # https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#volume-2
