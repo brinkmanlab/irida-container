@@ -36,6 +36,7 @@ resource "kubernetes_deployment" "irida_front" {
         automount_service_account_token = false
         container {
           image = "${local.irida_image}:${var.image_tag}"
+          image_pull_policy = var.debug ? "Always" : "IfNotPresent"
           name  = "irida-front"
           env {
             name  = "JAVA_OPTS"
