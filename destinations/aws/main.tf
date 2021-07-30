@@ -36,4 +36,5 @@ module "k8s" {
   namespace             = local.namespace
   plugins               = var.plugins
   additional_repos      = var.additional_repos
+  lb_annotations        = var.lb_annotations
 }
