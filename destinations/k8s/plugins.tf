@@ -10,7 +10,7 @@ resource "kubernetes_job" "plugins" {
         automount_service_account_token = false
         container {
           name              = "load-plugins"
-          command           = [ "bash", "-c", "mkdir -p '${local.data_dir}/plugins'; ${local.plugin_curl_cmd}"]
+          command           = [ "bash", "-c", "mkdir -p '${local.data_dir}/plugins'; rm -rf '${local.data_dir}'/plugins/*; ${local.plugin_curl_cmd}"]
           image             = "${local.irida_image}:${var.image_tag}"
           image_pull_policy = var.debug ? "Always" : null
           volume_mount {
