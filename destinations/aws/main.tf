@@ -1,5 +1,6 @@
 locals {
   namespace = var.namespace != null ? var.namespace : kubernetes_namespace.instance[0]
+  galaxy_repositories = module.k8s.galaxy_repositories
 }
 
 resource "kubernetes_namespace" "instance" {

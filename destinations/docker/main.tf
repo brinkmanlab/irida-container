@@ -1,5 +1,6 @@
 locals {
   network = length(docker_network.irida_network) == 1 ? docker_network.irida_network[0].name : var.network
+  galaxy_repositories = module.galaxy.galaxy_repositories
 }
 
 resource "docker_network" "irida_network" {

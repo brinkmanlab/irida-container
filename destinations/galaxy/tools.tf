@@ -2,6 +2,7 @@ locals {
   tool_list_path = "${abspath(path.root)}/tool-list.yml"
   tool_list_exist = fileexists(local.tool_list_path)
   repos = concat(yamldecode(local.tool_list_exist ? file(local.tool_list_path) : data.local_file.tool_list[0].content)["tools"], var.additional_repos)
+  galaxy_repositories = galaxy_repository.repositories
 }
 
 resource "docker_image" "irida" {

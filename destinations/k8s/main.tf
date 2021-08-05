@@ -1,6 +1,7 @@
 locals {
   base_url = var.base_url != "" ? var.base_url : kubernetes_service.irida.status.0.load_balancer.0.ingress.0.hostname
   namespace = var.namespace != null ? var.namespace : kubernetes_namespace.instance[0]
+  galaxy_repositories = module.galaxy.galaxy_repositories
 }
 
 resource "kubernetes_namespace" "instance" {
