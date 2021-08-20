@@ -75,6 +75,15 @@ resource "kubernetes_deployment" "irida_front" {
             name = "config"
             read_only = true
           }
+          dynamic "volume_mount" {
+            for_each = var.custom_pages
+            content {
+              mount_path = "${local.app_dir}/pages/${volume_mount.key}"
+              name = "custom"
+              read_only = true
+              sub_path = volume_mount.key
+            }
+          }
         }
         node_selector = {
           WorkClass = "service"
@@ -95,10 +104,24 @@ resource "kubernetes_deployment" "irida_front" {
             name = kubernetes_config_map.config.metadata.0.name
           }
         }
+        volume {
+          name = "custom"
+          config_map {
+            name = kubernetes_config_map.custom_pages.metadata.0.name
+          }
+        }
         # https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#volume-2
       }
     }
   }
+}
+
+resource "kubernetes_config_map" "custom_pages" {
+  metadata {
+    generate_name = "irida-custom-pages-"
+    namespace = local.namespace.metadata.0.name
+  }
+  data = var.custom_pages
 }
 
 #resource "kubernetes_horizontal_pod_autoscaler" "irida" {

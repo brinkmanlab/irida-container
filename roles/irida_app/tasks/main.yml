@@ -51,11 +51,19 @@
   register: irida_version
   delegate_to: buildah_server
 
-- name: Import irida.war
-  copy:
+- name: Import irida.war and unpack
+  unarchive:
+    copy: yes
     src: "{{ playbook_dir }}/irida/target/irida-{{ (irida_version.matches[0].values() | list)[0] }}.war"
-    dest: "/usr/local/tomcat/webapps/ROOT.war"
-    mode: u=rw,g=r,o=r
+    dest: "{{ paths.app }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Set permissions on unpacked files
+  file:
+    path: "{{ paths.app }}"
+    state: directory
+    mode: u=rwX,g=rX,o=rX
+    recurse: yes
 
 - name: Bundle tool list
   copy:

@@ -11,6 +11,7 @@ locals {
   assembly_dir          = local.ansible.paths.assembly
   config_dir            = local.ansible.paths.config
   tmp_dir               = local.ansible.paths.tmp
+  app_dir               = local.ansible.paths.app
   user_data_volume_name = var.user_data_volume_name != null ? var.user_data_volume_name : local.ansible.volumes.user_data.name
   db_data_volume_name   = var.db_data_volume_name != null ? var.db_data_volume_name : local.ansible.volumes.db_data.name
 
@@ -227,4 +228,9 @@ variable "additional_repos" {
   }))
   default     = []
   description = "Additional repositories to install to Galaxy"
+}
+
+variable "custom_pages" {
+  default = {}
+  description = "Custom pages, keyed on file name"
 }

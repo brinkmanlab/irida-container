@@ -27,6 +27,7 @@ paths:
   assembly: &assembly /irida/assembly
   tmp: /tmp
   config: /etc/irida
+  app: /usr/local/tomcat/webapps/ROOT
 
 irida:
   uid: 1000

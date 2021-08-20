@@ -38,4 +38,5 @@ module "k8s" {
   plugins               = var.plugins
   additional_repos      = var.additional_repos
   lb_annotations        = var.lb_annotations
+  custom_pages          = var.custom_pages
 }
