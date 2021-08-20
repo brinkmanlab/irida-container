@@ -17,6 +17,7 @@ resource "kubernetes_deployment" "irida_front" {
 
   spec {
     replicas          = lookup(local.replicates, "front", 1)
+    revision_history_limit = 0
     min_ready_seconds = 1
     strategy {
       type = "Recreate"

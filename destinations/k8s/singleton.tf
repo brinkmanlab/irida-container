@@ -17,6 +17,7 @@ resource "kubernetes_deployment" "irida_singleton" {
 
   spec {
     replicas          = lookup(local.replicates, "singleton", 1)
+    revision_history_limit = 0
     min_ready_seconds = 1
     strategy {
       type = "Recreate"
