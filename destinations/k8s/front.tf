@@ -158,6 +158,12 @@ resource "kubernetes_service" "irida" {
       port        = 80
       target_port = 8080
     }
+    port {
+      name        = "https"
+      protocol    = "TCP"
+      port        = 443
+      target_port = 80
+    }
 
     type = "LoadBalancer" # https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
   }
