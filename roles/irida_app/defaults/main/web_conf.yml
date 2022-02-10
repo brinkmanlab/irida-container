@@ -4,3 +4,6 @@ irida:
     mail.server.host: "{{ hostvars['mail'].hostname }}"
     mail.server.protocol: "{{ hostvars['mail'].protocol }}"
     mail.server.port: "{{ hostvars['mail'].port }}"
+    server.tomcat.remote_ip_header: x-forwarded-for
+    server.tomcat.protocol_header: x-forwarded-proto
+    server.tomcat.use-relative-redirects: true
