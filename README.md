@@ -53,7 +53,7 @@ A minimum of 8GB of RAM and 16GB of swap space is required. It is recommended to
 Several terraform destinations have been configured. Select one from the `./deployment/` folder that you wish to use.
 Modify `./changeme.auto.tfvars` with any custom values you like. Ensure you are authenticated with your cloud provider
 and that the required environment variables are set for the respective terraform provider. Review the relevant cloud provider section below
-for additional configuration. Once fully prepared, run `./deploy.sh` to deploy the application to the cloud.
+for additional configuration. Once fully prepared, run `terraform init` and then `./deploy.sh` to deploy the application to the cloud.
 
 ### AWS
 
