@@ -12,6 +12,12 @@
     - xpath: /Server/Service/Connector
       attribute: port
       value: "8080"
+    - xpath: /Server/Service/Connector
+      attribute: secure
+      value: "true"
+    - xpath: /Server/Service/Engine/Host/Valve[@className='org.apache.catalina.valves.AccessLogValve']
+      attribute: requestAttributesEnabled
+      value: "true"
 
 - name: Enable x-forwarded-for
   xml:
@@ -20,10 +26,11 @@
     add_children:
     - Valve:
         className: "org.apache.catalina.valves.RemoteIpValve"
-        remoteIpHeader: "x-forwarded-for"
-        remoteIpProxiesHeader: "x-forwarded-by"
         protocolHeader: "x-forwarded-proto"
-        protocolHeaderHttpsValue: "https"
+        internalProxies: ".*"
+        # remoteIpHeader: "x-forwarded-for"
+        # proxiesHeader: "x-forwarded-by"
+        # protocolHeaderHttpsValue: "https"
 
 - name: Generate irida.conf
   vars:

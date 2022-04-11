@@ -1,9 +1,13 @@
-# Azure Deployment
+# Galaxy Deployment
+
 <!-- BEGIN_TF_DOCS -->
 ## Providers
 
 | Name | Version |
 |------|---------|
+| <a name="provider_docker"></a> [docker](#provider\_docker) | n/a |
+| <a name="provider_galaxy"></a> [galaxy](#provider\_galaxy) | n/a |
+| <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Modules
@@ -50,5 +54,9 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [docker_container.tool_list](https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs/resources/container) | resource |
+| [docker_image.irida](https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs/resources/image) | resource |
+| [galaxy_repository.repositories](https://registry.terraform.io/providers/brinkmanlab/galaxy/latest/docs/resources/repository) | resource |
 | [random_password.db_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [local_file.tool_list](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 <!-- END_TF_DOCS -->
