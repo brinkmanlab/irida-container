@@ -10,3 +10,4 @@ prokka: c8m16
 mentalist: c16m32
 spades: c16m32
 refseq_masher_contains: c1m4
+smalt: c1m2
