@@ -124,6 +124,7 @@ resource "kubernetes_config_map" "custom_pages" {
   data = var.custom_pages
 }
 
+# IRIDA currently stores the user session in memory and does not allow replication of the web profile
 #resource "kubernetes_horizontal_pod_autoscaler" "irida" {
 #  for_each = local.profiles
 #  metadata {
