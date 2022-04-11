@@ -1,3 +1,4 @@
+# AWS IRIDA deployment example
 
 Change the current working directory to `./deployment/aws`. Modify `./changeme.auto.tfvars` with any custom values you like, especially the region.
 See the [supported regions for EKS](https://docs.aws.amazon.com/general/latest/gr/eks.html) as not all regions support deployment. This step is independent of the default region setting in the next step.
@@ -37,10 +38,10 @@ Refer to the Kubernetes section for the remaining information.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_base_url"></a> [base\_url](#input\_base\_url) | The externally visible URL for accessing this instance of IRIDA. This key is used by the e-mailer when sending out e-mail notifications (password resets, for example) and embeds this URL directly in the body of the e-mail. | `string` | n/a | yes |
-| <a name="input_debug"></a> [debug](#input\_debug) | n/a | `bool` | `false` | no |
-| <a name="input_email"></a> [email](#input\_email) | n/a | `string` | n/a | yes |
-| <a name="input_instance"></a> [instance](#input\_instance) | n/a | `string` | n/a | yes |
-| <a name="input_region"></a> [region](#input\_region) | n/a | `string` | n/a | yes |
+| <a name="input_debug"></a> [debug](#input\_debug) | Enabling will put the deployment into a mode suitable for debugging | `bool` | `false` | no |
+| <a name="input_email"></a> [email](#input\_email) | Email address to send automated emails from | `string` | n/a | yes |
+| <a name="input_instance"></a> [instance](#input\_instance) | Unique deployment instance identifier | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | AWS region to deploy into | `string` | n/a | yes |
 
 ## Outputs
 

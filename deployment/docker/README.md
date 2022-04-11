@@ -58,12 +58,12 @@ A minimum of 8GB of RAM and 16GB of swap space is required. It is recommended to
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_base_url"></a> [base\_url](#input\_base\_url) | The externally visible URL for accessing this instance of IRIDA. This key is used by the e-mailer when sending out e-mail notifications (password resets, for example) and embeds this URL directly in the body of the e-mail. | `string` | n/a | yes |
-| <a name="input_debug"></a> [debug](#input\_debug) | n/a | `bool` | n/a | yes |
+| <a name="input_debug"></a> [debug](#input\_debug) | Enabling will put the deployment into a mode suitable for debugging | `bool` | n/a | yes |
 | <a name="input_docker_gid"></a> [docker\_gid](#input\_docker\_gid) | GID with write permission to /var/run/docker.sock | `number` | n/a | yes |
 | <a name="input_docker_socket_path"></a> [docker\_socket\_path](#input\_docker\_socket\_path) | Host path to docker socket | `string` | `"/var/run/docker.sock"` | no |
-| <a name="input_email"></a> [email](#input\_email) | n/a | `string` | n/a | yes |
+| <a name="input_email"></a> [email](#input\_email) | Email address to send automated emails from | `string` | n/a | yes |
 | <a name="input_host_port"></a> [host\_port](#input\_host\_port) | Host port to expose galaxy service | `number` | n/a | yes |
-| <a name="input_instance"></a> [instance](#input\_instance) | n/a | `string` | n/a | yes |
+| <a name="input_instance"></a> [instance](#input\_instance) | Unique deployment instance identifier | `string` | n/a | yes |
 
 ## Outputs
 
