@@ -38,7 +38,8 @@ resource "kubernetes_namespace" "instance" {
 }
 
 module "galaxy-storage" {
-  source = "github.com/brinkmanlab/galaxy-container.git//destinations/aws/storage"
+  #source = "github.com/brinkmanlab/galaxy-container.git//destinations/aws/storage"
+  source = "../../../galaxy-container/destinations/aws/storage"
   instance = var.instance
   user_data_volume_name = "user-data-${var.instance}"
   vpc = module.cloud.vpc
@@ -57,7 +58,8 @@ module "irida-storage" {
 }
 
 module "galaxy" {
-  source   = "github.com/brinkmanlab/galaxy-container.git//destinations/aws"
+  #source   = "github.com/brinkmanlab/galaxy-container.git//destinations/aws"
+  source   = "../../../galaxy-container/destinations/aws"
   instance = var.instance
   namespace = kubernetes_namespace.instance
   galaxy_conf = {
@@ -75,6 +77,7 @@ module "galaxy" {
   extra_job_mounts = module.irida-storage.extra_job_mounts
   extra_mounts = module.irida-storage.extra_mounts
   tool_mappings = yamldecode(file("../../tool_mapping.yml"))
+  tool_containers = {"foo": ""}
 }
 
 provider "galaxy" {
@@ -83,7 +86,8 @@ provider "galaxy" {
 }
 
 module "admin_user" {
-  source         = "github.com/brinkmanlab/galaxy-container.git//modules/bootstrap_admin"
+  #source         = "github.com/brinkmanlab/galaxy-container.git//modules/bootstrap_admin"
+  source         = "../../../galaxy-container/modules/bootstrap_admin"
   email          = var.email
   galaxy_url     = "http://${module.galaxy.endpoint}"
   master_api_key = module.galaxy.master_api_key

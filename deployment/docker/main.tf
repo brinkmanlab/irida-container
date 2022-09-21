@@ -3,7 +3,8 @@ resource "docker_volume" "user_data" {
 }
 
 module "galaxy" {
-  source   = "github.com/brinkmanlab/galaxy-container.git//destinations/docker"
+  #source   = "github.com/brinkmanlab/galaxy-container.git//destinations/docker"
+  source   = "../../../galaxy-container/destinations/docker"
   instance = var.instance
   galaxy_conf = {
     require_login       = true
@@ -28,7 +29,8 @@ module "galaxy" {
 }
 
 module "admin_user" {
-  source         = "github.com/brinkmanlab/galaxy-container.git//modules/bootstrap_admin"
+  #source         = "github.com/brinkmanlab/galaxy-container.git//modules/bootstrap_admin"
+  source         = "../../../galaxy-container/modules/bootstrap_admin"
   email          = var.email
   galaxy_url     = "http://localhost:${module.galaxy.host_port}"
   master_api_key = module.galaxy.master_api_key

@@ -1,0 +1,12 @@
+shovill: 'quay.io/biocontainers/shovill:1.1.0--hdfd78af_1'
+sistr_cmd: 'quay.io/biocontainers/sistr_cmd:1.1.1--pyh864c0ab_2'
+flash:
+regexColumn1:
+regex1:
+filter_spades_repeat:
+assemblystats:
+prokka:
+mentalist:
+spades:
+refseq_masher_contains:
+smalt: 'mulled-v2-c60ecccd86a908be8a585a952c293799acb10b93:d395d8e3aca516482fbc9d7ef7bdeb01c5ccca03'
